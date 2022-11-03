@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_steps"
+        android:icon="@drawable/ic_baseline_directions_run_24"
+        android:title="@string/title_steps" />
+
+    <item
+        android:id="@+id/navigation_stats"
+        android:icon="@drawable/ic_baseline_show_chart_24"
+        android:title="@string/title_stats" />
+
+    <item
+        android:id="@+id/navigation_info"
+        android:icon="@drawable/ic_baseline_article_24"
+        android:title="@string/title_info" />
+
+
+</menu>
