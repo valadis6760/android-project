@@ -2,8 +2,9 @@ package com.example.mdpproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -13,5 +14,10 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Settings");
+    }
+
+    public void goToPersonalInfo(View view) {
+        Intent myIntent = new Intent(SettingsActivity.this, PersonalInfoActivity.class);
+        startActivity(myIntent);
     }
 }
