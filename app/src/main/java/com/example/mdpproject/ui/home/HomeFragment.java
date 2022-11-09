@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment {
             switch (action){
                 case SensorService.ACTION_STEP_VALUE:
                     steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
-
+                    Log.d(TAG, "handleBroadcast: Action ="+action+" Value:"+steps);
 
                     circularProgressBar.setProgress(steps);
 
@@ -59,15 +59,18 @@ public class HomeFragment extends Fragment {
 
                     simpleProgressBar.setProgress(steps);
                     textUser.setText(steps+" / "+user_goal);
+
                     break;
                 case SensorService.ACTION_USER_GOAL:
                     user_goal = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
                     circularProgressBar.setProgressMax(user_goal);
+                    Log.d(TAG, "handleBroadcast: Action ="+action+" Value:"+user_goal);
                     break;
 
                 case SensorService.ACTION_GLOBAL_GOAL:
                     global_goal = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
                     simpleProgressBar.setMax(global_goal);
+                    Log.d(TAG, "handleBroadcast: Action ="+action+" Value:"+global_goal);
                     break;
 
             }
@@ -94,10 +97,13 @@ public class HomeFragment extends Fragment {
          circularProgressBar = root.findViewById(R.id.home_user_progress);
 
         textView = binding.homeUserPercent;
-          textUser = binding.homeUserSteps ;
-          TextGlobal = binding.homeGlobalSteps;
+        textUser = binding.homeUserSteps ;
+        TextGlobal = binding.homeGlobalSteps;
 
         getActivity().startService(new Intent(getActivity(), SensorService.class));
+
+        //0. 04 calories per step
+        //user height * steps = distance
 
 
 

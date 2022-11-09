@@ -2,6 +2,8 @@ package com.example.mdpproject.service;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,13 +12,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.example.mdpproject.receiver.AlarmReceiver;
 
@@ -24,8 +37,11 @@ import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
 public class SensorService extends Service implements SensorEventListener {
@@ -34,10 +50,20 @@ public class SensorService extends Service implements SensorEventListener {
     private Sensor stepCounter;
     private int user_steps;
     private int user_goal;
+    private boolean user_goal_complete = false;
     private int global_goal;
 
-    SharedPreferences sharedpreferences ;
+    final Handler handler = new Handler();
+    final int delay = 300000; // 1000 milliseconds == 1 second  = 5mins
+
+    MqttAndroidClient client;
+    String clientId;
+
+    SharedPreferences sharedpreferences;
     SharedPreferences.Editor editor;
+
+    LocationManager locationManager;
+
 
     public final static String ACTION_STEP_VALUE =
             "com.example.mdpproject.service.ACTION_STEP_VALUE";
@@ -68,12 +94,19 @@ public class SensorService extends Service implements SensorEventListener {
             if (intent.getAction().equals(AlarmReceiver.ACTION_ALARM_SET)) {
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
+                user_goal_complete = false;
                 updateSensorValue(user_steps);
             }
         }
     };
 
-    void updateSensorValue(int value){
+    void updateSensorValue(int value) {
+        if(user_steps>=user_goal&&!user_goal_complete){
+            Location location = getCurrentLocation();
+            user_goal_complete = true;
+            Log.d(TAG, "GOAL COMPLETE: "+location);
+
+        }
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putInt("SENSOR_STEPS", value); // Storing integer
         editor.apply(); // commit changes
@@ -81,25 +114,63 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "onCreate SERVICE ! ");
-
         sharedpreferences = getSharedPreferences("SENSOR_DATA_PREF", Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
-        user_steps =  sharedpreferences.getInt("SENSOR_STEPS", 0);
-        Log.d(TAG, "onCreate: STEPSSSSSSS"+user_steps);
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
-        //connectToMQTT();
-        //createAlarm();
-        getDataFromMQTT();
-        getUserGoal();
 
 
         registerReceiver(broadcastReceiver, new IntentFilter(AlarmReceiver.ACTION_ALARM_SET));
 
 
+        getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+
+
+
+
+
+        user_steps = sharedpreferences.getInt("SENSOR_STEPS", 0);
+        Log.d(TAG, "onCreate: STEPSSSSSSS" + user_steps);
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                subscribeToMQTT();
+                getUserGoal();
+            }
+        }, 3000);
+
+
+
+
+        //getCurrentLocation();
+
+        connectToMQTT();
+        //createAlarm();
+
+
+
+
+
+
+    }
+
+    Location getCurrentLocation() {
+        //https://stackoverflow.com/questions/57863500/how-can-i-get-my-current-location-in-android-using-gps
+        try {
+            @SuppressLint("MissingPermission")
+            Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Log.d(TAG, "onCreate: Last loc "+ gps_loc);
+            return gps_loc;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -114,68 +185,66 @@ public class SensorService extends Service implements SensorEventListener {
 
     //https://stackoverflow.com/questions/48124195/how-to-schedule-a-task-every-night-at-12-am
     public void createAlarm() {
-        //System request code
         int DATA_FETCHER_RC = 123;
-        //Create an alarm manager
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-        //Create the time of day you would like it to go off. Use a calendar
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 58);
-
-        //Create an intent that points to the receiver. The system will notify the app about the current time, and send a broadcast to the app
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //initialize the alarm by using inexactrepeating. This allows the system to scheduler your alarm at the most efficient time around your
-        //set time, it is usually a few seconds off your requested time.
-        // you can also use setExact however this is not recommended. Use this only if it must be done then.
-
-        //Also set the interval using the AlarmManager constants
         mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
-
     }
 
     public void connectToMQTT(){
-        String clientId = MqttClient.generateClientId();
-        MqttAndroidClient client =
-                new MqttAndroidClient(this.getApplicationContext(), "tcp://broker.hivemq.com:1883",
-                        clientId);
+        //https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-paho-android-service/
+        clientId = MqttClient.generateClientId(); //paho42344242777022
+        Log.d(TAG, "connectToMQTT: "+clientId);
+
+        client = new MqttAndroidClient(this.getApplicationContext(),"ssl://98ffc5f1d5b742ea97a55790d35f07da.s1.eu.hivemq.cloud:8883" , clientId);
 
         try {
-            IMqttToken token = client.connect();
+
 
 //            //MQTT Version
-//            MqttConnectOptions options = new MqttConnectOptions();
-//            options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
-//            IMqttToken token = client.connect(options);
+            MqttConnectOptions options = new MqttConnectOptions();
+           // options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
+
 //
-//            //MQTT LWT
-//            String topic = "users/last/will";
-//            byte[] payload = "some payload".getBytes();
-//            options.setWill(topic, payload ,1,false);
-//            IMqttToken token = client.connect(options);
-//
-//            //MQTT password username
-//            options.setUserName("USERNAME");
-//            options.setPassword("PASSWORD".toCharArray());
-//
-//            IMqttToken token = client.connect(options);
+            //MQTT LWT
+            String topic = "users/steps";
+            byte[] payload = "offline".getBytes();
+            options.setWill(topic, payload ,1,true);
+
+
+            //MQTT password username
+            options.setUserName("miotuser");
+            options.setPassword("miotpassword".toCharArray());
+
+            IMqttToken token = client.connect(options);
 
 
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     // We are connected
-                    Log.d(TAG, "onSuccess");
+                    Log.d(TAG, "MQTT CONNECT onSuccess");
+                    subscribeToMQTT();
+
+
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            System.out.println("myHandler: here!"); // Do your work here
+                            publishToMQTT(user_steps);
+                            handler.postDelayed(this, delay);
+                        }
+                    }, delay);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     // Something went wrong e.g. connection timeout or firewall problems
-                    Log.d(TAG, "onFailure");
-
+                    Log.d(TAG, "MQTT CONNECT onFailure");
+                    Log.d(TAG, exception.getMessage());
                 }
             });
         } catch (MqttException e) {
@@ -183,12 +252,47 @@ public class SensorService extends Service implements SensorEventListener {
         }
     };
 
-    public void getDataFromMQTT(){
+    public void subscribeToMQTT(){
+
+
         handleBroadcast(ACTION_GLOBAL_GOAL,10000);
+        global_goal = 10000;
+
+//        String topic = "users/steps";
+//        int qos = 1;
+//        try {
+//            IMqttToken subToken = client.subscribe(topic, qos);
+//            subToken.setActionCallback(new IMqttActionListener() {
+//                @Override
+//                public void onSuccess(IMqttToken asyncActionToken) {
+//                    // The message was published
+//                }
+//
+//                @Override
+//                public void onFailure(IMqttToken asyncActionToken,
+//                                      Throwable exception) {
+//                    // The subscription could not be performed, maybe the user was not
+//                    // authorized to subscribe on the specified topic e.g. using wildcards
+//
+//                }
+//            });
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
     };
 
-    public void pushDataToMQTT(int value){
+    public void publishToMQTT(int value){
         Log.d(TAG, "pushDataToMQTT: Sending data to MQTT:"+value);
+        String topic = "users/steps";
+        String payload = Integer.toString(value);
+        byte[] encodedPayload = new byte[0];
+        try {
+            encodedPayload = payload.getBytes("UTF-8");
+            MqttMessage message = new MqttMessage(encodedPayload);
+            client.publish(topic, message);
+        } catch (UnsupportedEncodingException | MqttException e) {
+            e.printStackTrace();
+        }
     };
 
     public void getUserGoal(){
@@ -202,7 +306,7 @@ public class SensorService extends Service implements SensorEventListener {
             case Sensor.TYPE_STEP_DETECTOR:
                 user_steps+=1;
                 updateSensorValue(user_steps);
-                pushDataToMQTT(user_steps);
+                //publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE,user_steps);
                 Log.d(TAG, "onSensorChanged: "+user_steps);
                 break;
@@ -213,6 +317,7 @@ public class SensorService extends Service implements SensorEventListener {
         final Intent intent = new Intent(ACTION);
         intent.putExtra(EXTRA_DATA_VALUE,value);
         sendBroadcast(intent);
+        Log.d(TAG, "handleBroadcast: Action ="+ACTION+" Value:"+value);
     };
 
     @Override
