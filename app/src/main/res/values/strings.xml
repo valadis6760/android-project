@@ -7,4 +7,17 @@
     <string name="title_stats">Stats</string>
     <string name="title_info">Info</string>
     <string name="title_Settings">Settings</string>
+    <string name="first_name">First Name:</string>
+    <string name="gender">Gender:</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="age">Age:</string>
+    <string name="height">Height:</string>
+    <string name="in_centimeters">In centimeters</string>
+    <string name="weight">Weight:</string>
+    <string name="in_kilograms">In kilograms</string>
+    <string name="goal">Goal</string>
+    <string name="number_of_steps">Number of steps</string>
+    <string name="submit">Submit</string>
+    <string name="personal_info"><b>Personal Info</b></string>
 </resources>
