@@ -30,21 +30,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Week" />
+                    android:text="@string/week" />
 
                 <Button
                     android:id="@+id/dashboard_button_month"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Month" />
+                    android:text="@string/month" />
 
                 <Button
                     android:id="@+id/dashboard_button_year"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Year" />
+                    android:text="@string/year" />
             </LinearLayout>
 
             <LinearLayout
