@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
+import com.example.mdpproject.db.DBHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_NETWORK_STATE},
                 1);
+
+        DBHelper db = new DBHelper(this);
+        // Retrieve all the required info
     }
 
     @Override
