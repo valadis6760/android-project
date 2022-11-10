@@ -104,6 +104,7 @@ public class SensorService extends Service implements SensorEventListener {
         if(user_steps>=user_goal&&!user_goal_complete){
             Location location = getCurrentLocation();
             user_goal_complete = true;
+
             Log.d(TAG, "GOAL COMPLETE: "+location);
 
         }
