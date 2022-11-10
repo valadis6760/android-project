@@ -151,7 +151,7 @@ public class SensorService extends Service implements SensorEventListener {
 
         //getCurrentLocation();
 
-        connectToMQTT();
+        //connectToMQTT();
         //createAlarm();
 
 

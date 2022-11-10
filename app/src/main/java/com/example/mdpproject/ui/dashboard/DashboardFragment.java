@@ -25,11 +25,14 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
-import java.time.ZonedDateTime;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
@@ -39,8 +42,10 @@ public class DashboardFragment extends Fragment {
 
     private List<BarEntry> dailyInfoList = new ArrayList<>();
 
+    DateFormat dt = new SimpleDateFormat("yyyy/mm/dd");
+
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                                                                                               ViewGroup container, Bundle savedInstanceState) {
         DashboardViewModel dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
 
@@ -52,6 +57,7 @@ public class DashboardFragment extends Fragment {
         barChart.getDescription().setEnabled(false);
         barChart.setDrawValueAboveBar(false);
 
+        dbHelper = new DBHelper(this.getContext());
         initializeGraph(7);
 
         BarDataSet bardataset = new BarDataSet(dailyInfoList, "Number of Steps");
@@ -86,7 +92,11 @@ public class DashboardFragment extends Fragment {
         cal.add(Calendar.DATE, -range);
         Date today = new Date();
         Date oneWeekAgo = cal.getTime();
-        return dbHelper.getDailyInfoByDateRange(oneWeekAgo, today);
+        try {
+            return dbHelper.getDailyInfoByDateRange(oneWeekAgo, today);
+        } catch (ParseException e) {
+            return new ArrayList<>();
+        }
     }
 
     private void initializeGraph(int days) {
@@ -97,4 +107,5 @@ public class DashboardFragment extends Fragment {
             spacing += 100;
         }
     }
+
 }
