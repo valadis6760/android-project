@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
         // If there is no personal info stored, the user must insert their data first
         if (sharedPreferences.getString("first-name", null) == null) {
-            navigateToPersonalInfo();
+            navigateToSettingsActivity();
         } else {
             BottomNavigationView navView = findViewById(R.id.nav_view);
             // Passing each menu ID as a set of Ids because each
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             NavigationUI.setupWithNavController(binding.navView, navController);
         }
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -63,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_NETWORK_STATE},
                 1);
 
-        DBHelper db = new DBHelper(this);
-        // Retrieve all the required info
     }
 
     @Override
@@ -88,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void navigateToPersonalInfo() {
-        Intent myIntent = new Intent(MainActivity.this, PersonalInfoActivity.class);
+    private void navigateToSettingsActivity() {
+        Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(myIntent);
     }
 }

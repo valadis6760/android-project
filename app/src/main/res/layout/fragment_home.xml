@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".ui.home.HomeFragment">
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/home_username"
@@ -66,7 +57,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/home_user_goal"
+            android:id="@+id/home_usergoal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -116,11 +107,7 @@
                     android:layout_gravity="center"
                     android:text="User Steps :" />
 
-                <TextView
-                    android:id="@+id/home_global_steps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Global Steps :" />
+
 
                 <TextView
                     android:id="@+id/home_user_calories"
@@ -133,6 +120,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Distance :" />
+
+                <TextView
+                    android:id="@+id/home_user_goal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="User Goal :" />
+
+                <TextView
+                    android:id="@+id/home_user_global"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Global Goal :" />
             </LinearLayout>
 
             <LinearLayout
@@ -146,35 +146,46 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="User Steps" />
+                    android:text="0" />
 
-                <TextView
-                    android:id="@+id/home_global_steps_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Global Steps " />
+
 
                 <TextView
                     android:id="@+id/home_user_calories_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Calories Burned" />
+                    android:text="0" />
+
+
 
                 <TextView
                     android:id="@+id/home_user_distance_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Distance" />
+                    android:text="0" />
+
+                <TextView
+                    android:id="@+id/home_user_goal_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="0" />
+
+                <TextView
+                    android:id="@+id/home_global_goal_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="0" />
 
             </LinearLayout>
 
         </LinearLayout>
 
 
-    </LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

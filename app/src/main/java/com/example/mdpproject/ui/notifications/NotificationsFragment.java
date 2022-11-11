@@ -5,22 +5,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.mdpproject.R;
 import com.example.mdpproject.databinding.FragmentNotificationsBinding;
+import com.example.mdpproject.utils.Downloader;
 
-import java.util.List;
-
-import at.theengine.android.simple_rss2_android.RSSItem;
-import at.theengine.android.simple_rss2_android.SimpleRss2Parser;
-import at.theengine.android.simple_rss2_android.SimpleRss2ParserCallback;
 
 public class NotificationsFragment extends Fragment {
+    private RecyclerView recyclerView;
+    final static String UrlAddress ="https://www.runtastic.com/blog/en/feed/";
 
     private FragmentNotificationsBinding binding;
 
@@ -32,24 +31,9 @@ public class NotificationsFragment extends Fragment {
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SimpleRss2Parser parser = new SimpleRss2Parser("https://www.runtastic.com/blog/en/feed",
-                new SimpleRss2ParserCallback() {
-                    @Override
-                    public void onFeedParsed(List<RSSItem> items) {
-                        for(int i = 0; i < items.size(); i++){
-                            Log.d("SimpleRss2ParserDemo",items.get(i).getTitle());
-                        }
-                    }
-                    @Override
-                    public void onError(Exception ex) {
-                        Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-);
-        parser.parseAsync();
-
-        final TextView textView = binding.textNotifications;
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        recyclerView = root.findViewById(R.id.notification_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        new Downloader(getContext(),UrlAddress,recyclerView).execute();
         return root;
     }
 

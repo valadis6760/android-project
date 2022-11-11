@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class SensorService extends Service implements SensorEventListener {
 
@@ -63,6 +65,8 @@ public class SensorService extends Service implements SensorEventListener {
     SharedPreferences.Editor editor;
 
     LocationManager locationManager;
+
+    TextToSpeech t1;
 
 
     public final static String ACTION_STEP_VALUE =
@@ -104,7 +108,7 @@ public class SensorService extends Service implements SensorEventListener {
         if(user_steps>=user_goal&&!user_goal_complete){
             Location location = getCurrentLocation();
             user_goal_complete = true;
-
+            t1.speak("Congratulations on Completing your Goal", TextToSpeech.QUEUE_FLUSH, null);
             Log.d(TAG, "GOAL COMPLETE: "+location);
 
         }
@@ -153,6 +157,15 @@ public class SensorService extends Service implements SensorEventListener {
 
         //connectToMQTT();
         //createAlarm();
+
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.UK);
+                }
+            }
+        });
 
 
 
@@ -232,13 +245,13 @@ public class SensorService extends Service implements SensorEventListener {
                     subscribeToMQTT();
 
 
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            System.out.println("myHandler: here!"); // Do your work here
-                            publishToMQTT(user_steps);
-                            handler.postDelayed(this, delay);
-                        }
-                    }, delay);
+//                    handler.postDelayed(new Runnable() {
+//                        public void run() {
+//                            System.out.println("myHandler: here!"); // Do your work here
+//                            publishToMQTT(user_steps);
+//                            handler.postDelayed(this, delay);
+//                        }
+//                    }, delay);
                 }
 
                 @Override
@@ -305,7 +318,13 @@ public class SensorService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
-                user_steps+=1;
+                user_steps+=100;
+//                int MULTIPLE_20 = totalCount % 20;
+//                if (MULTIPLE_20 == 0) {
+//                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//                    v.vibrate(400);
+//                }
+//                t1.speak("Hello", TextToSpeech.QUEUE_FLUSH, null);
                 updateSensorValue(user_steps);
                 //publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE,user_steps);

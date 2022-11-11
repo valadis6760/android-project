@@ -1,5 +1,6 @@
 package com.example.mdpproject.ui.dashboard;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.mdpproject.MainActivity;
 import com.example.mdpproject.R;
+import com.example.mdpproject.SettingsActivity;
+import com.example.mdpproject.activity.MapsActivity;
 import com.example.mdpproject.databinding.FragmentDashboardBinding;
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
@@ -44,6 +48,7 @@ public class DashboardFragment extends Fragment {
     private Button week;
     private Button month;
     private Button year;
+    private Button LocationHistory;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class DashboardFragment extends Fragment {
         week = root.findViewById(R.id.dashboard_button_week);
         month = root.findViewById(R.id.dashboard_button_month);
         year = root.findViewById(R.id.dashboard_button_year);
+        LocationHistory = root.findViewById(R.id.dashboard_location_history);
 
         barChart.getDescription().setEnabled(false);
         barChart.setDrawValueAboveBar(false);
@@ -98,6 +104,14 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 yearSelected();
+            }
+        });
+
+        LocationHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getContext(), MapsActivity.class);
+                startActivity(myIntent);
             }
         });
 
