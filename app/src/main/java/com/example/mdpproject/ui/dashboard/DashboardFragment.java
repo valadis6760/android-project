@@ -174,7 +174,7 @@ public class DashboardFragment extends Fragment {
 //        dbHelper.insertContact("2022-11-11 10:20:50","8234","36.45","43.23");
 //        dbHelper.insertContact("2022-11-12 10:10:50","7234","22.45","76.23");
 //        dbHelper.insertContact("2022-11-22 10:00:50","4234","73.45","89.23");
-//
+
 
 
 

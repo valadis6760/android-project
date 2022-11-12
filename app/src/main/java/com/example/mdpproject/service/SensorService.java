@@ -36,7 +36,9 @@ import com.example.mdpproject.receiver.AlarmReceiver;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -122,10 +124,6 @@ public class SensorService extends Service implements SensorEventListener {
             Log.d(TAG, "GOAL COMPLETE: "+location);
 
         }
-        if(user_steps>=global_goal&&!user_global_goal_complete&&global_goal_set){
-            user_global_goal_complete = true;
-            t1.speak("Congratulations on Completing the Global Goal", TextToSpeech.QUEUE_FLUSH, null);
-        }
 
         int per = (int)Math.floor(((float)user_steps/(float)user_goal)* 100f);
         Log.d(TAG, "updateSensorValue: PERCENTTTTT "+per);
@@ -173,8 +171,8 @@ public class SensorService extends Service implements SensorEventListener {
 
         //getCurrentLocation();
 
-        //connectToMQTT();
-        //createAlarm();
+        connectToMQTT();
+        createAlarm();
 
         t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -215,8 +213,8 @@ public class SensorService extends Service implements SensorEventListener {
         int DATA_FETCHER_RC = 123;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 58);
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 11);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
@@ -246,6 +244,7 @@ public class SensorService extends Service implements SensorEventListener {
             //MQTT password username
             options.setUserName("miotuser");
             options.setPassword("miotpassword".toCharArray());
+            client.setCallback(new MqttCallbackHandler(this.getApplicationContext()));
 
             IMqttToken token = client.connect(options);
 
@@ -279,6 +278,37 @@ public class SensorService extends Service implements SensorEventListener {
         }
     };
 
+    public class MqttCallbackHandler implements MqttCallbackExtended {
+        public MqttCallbackHandler(Context applicationContext) {
+        }
+
+        @Override
+        public void connectComplete(boolean b, String s) {
+            Log.w("mqtt", s);
+        }
+
+        @Override
+        public void connectionLost(Throwable throwable) {
+
+        }
+
+        @Override
+        public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+            Log.d("Anjing", mqttMessage.toString());
+            int data = Integer.parseInt(mqttMessage.toString());
+             handleBroadcast(ACTION_GLOBAL_GOAL,data);
+                       global_goal_set = true;
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putInt("global_goal", data); // Storing integer
+                    editor.apply(); // commit changes
+        }
+
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+            Log.d(TAG, "deliveryComplete: ");
+        }
+    }
+
     public void subscribeToMQTT(){
 
 
@@ -293,11 +323,8 @@ public class SensorService extends Service implements SensorEventListener {
 
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    handleBroadcast(ACTION_GLOBAL_GOAL,10000);
-         //           global_goal_set = true;
-//                    SharedPreferences.Editor editor = sharedpreferences.edit();
-//                    editor.putInt("global_goal", value); // Storing integer
-//                    editor.apply(); // commit changes
+                    Log.d(TAG, "onSuccess: SCRIBED TO GLOBAL");
+
                 }
 
                 @Override
@@ -315,7 +342,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void publishToMQTT(int value){
         Log.d(TAG, "pushDataToMQTT: Sending data to MQTT:"+value);
-        String topic = "users/"+clientId+"/steps";
+        String topic = "users/steps";
         String payload = Integer.toString(value);
         byte[] encodedPayload = new byte[0];
         try {
@@ -333,12 +360,7 @@ public class SensorService extends Service implements SensorEventListener {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
                 user_steps+=50;
-//                int MULTIPLE_20 = totalCount % 20;
-//                if (MULTIPLE_20 == 0) {
-//                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                    v.vibrate(400);
-//                }
-//                t1.speak("Hello", TextToSpeech.QUEUE_FLUSH, null);
+
                 updateSensorValue(user_steps);
                 //publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE,user_steps);
