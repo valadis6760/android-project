@@ -14,6 +14,7 @@
 
     <application
         android:allowBackup="true"
+
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -30,6 +31,7 @@
 
         <activity
             android:name=".activity.MapsActivity"
+            android:screenOrientation="nosensor"
             android:exported="false"
             android:label="@string/title_activity_maps"
             android:parentActivityName=".MainActivity"
@@ -48,6 +50,7 @@
 
         <activity
             android:name=".SettingsActivity"
+            android:screenOrientation="nosensor"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 

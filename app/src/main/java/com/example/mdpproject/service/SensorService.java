@@ -52,11 +52,10 @@ public class SensorService extends Service implements SensorEventListener {
     private Sensor stepCounter;
     private int user_steps;
     private int user_goal;
-    private boolean user_goal_complete = false;
     private int global_goal;
-
-    final Handler handler = new Handler();
-    final int delay = 300000; // 1000 milliseconds == 1 second  = 5mins
+    private boolean user_goal_complete = false;
+    private boolean user_global_goal_complete = false;
+    private boolean global_goal_set = false;
 
     MqttAndroidClient client;
     String clientId;
@@ -66,8 +65,9 @@ public class SensorService extends Service implements SensorEventListener {
 
     LocationManager locationManager;
 
-    TextToSpeech t1;
+    int text_to_speak_threshold=20;
 
+    TextToSpeech t1;
 
     public final static String ACTION_STEP_VALUE =
             "com.example.mdpproject.service.ACTION_STEP_VALUE";
@@ -77,6 +77,8 @@ public class SensorService extends Service implements SensorEventListener {
             "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
     public final static String EXTRA_DATA_VALUE =
             "com.example.mdpproject.service.EXTRA_DATA_VALUE";
+    public final static String SET_TEXT_TO_SPEECH =
+            "com.example.mdpproject.service.SET_TEXT_TO_SPEECH";
 
     public SensorService() {
     }
@@ -95,16 +97,24 @@ public class SensorService extends Service implements SensorEventListener {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(AlarmReceiver.ACTION_ALARM_SET)) {
+            final String action = intent.getAction();
+            Log.d(TAG, "onReceive: "+action);
+            if (AlarmReceiver.ACTION_ALARM_SET.equals(action)) {
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
                 user_goal_complete = false;
+                user_global_goal_complete= false;
                 updateSensorValue(user_steps);
+                //create databse
             }
+
+
+
         }
     };
 
     void updateSensorValue(int value) {
+
         if(user_steps>=user_goal&&!user_goal_complete){
             Location location = getCurrentLocation();
             user_goal_complete = true;
@@ -112,14 +122,30 @@ public class SensorService extends Service implements SensorEventListener {
             Log.d(TAG, "GOAL COMPLETE: "+location);
 
         }
+        if(user_steps>=global_goal&&!user_global_goal_complete&&global_goal_set){
+            user_global_goal_complete = true;
+            t1.speak("Congratulations on Completing the Global Goal", TextToSpeech.QUEUE_FLUSH, null);
+        }
+
+        int per = (int)Math.floor(((float)user_steps/(float)user_goal)* 100f);
+        Log.d(TAG, "updateSensorValue: PERCENTTTTT "+per);
+        int MULTIPLE_2 = (per/10) % 2;
+                        if (MULTIPLE_2 == 0&& (per%10)==0 && text_to_speak_threshold==per && per != 100) {
+                            text_to_speak_threshold +=20;
+                            Log.d(TAG, "updateSensorValue: TEXT TO SPEACH "+per);
+                            t1.speak("You have reached "+per+" %", TextToSpeech.QUEUE_FLUSH, null);
+                }
+
+
+
         SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putInt("SENSOR_STEPS", value); // Storing integer
+        editor.putInt("sensor_step", value); // Storing integer
         editor.apply(); // commit changes
     }
 
     @Override
     public void onCreate() {
-        sharedpreferences = getSharedPreferences("SENSOR_DATA_PREF", Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -134,23 +160,15 @@ public class SensorService extends Service implements SensorEventListener {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
+        clientId = MqttClient.generateClientId(); //paho42344242777022
+        //subscribeToMQTT();
 
 
+        user_steps = sharedpreferences.getInt("sensor_step", 0);
+        global_goal = sharedpreferences.getInt("global_goal", 0);
+        user_goal = sharedpreferences.getInt("goal",0);
 
-
-        user_steps = sharedpreferences.getInt("SENSOR_STEPS", 0);
         Log.d(TAG, "onCreate: STEPSSSSSSS" + user_steps);
-
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                subscribeToMQTT();
-                getUserGoal();
-            }
-        }, 3000);
-
-
 
 
         //getCurrentLocation();
@@ -166,11 +184,6 @@ public class SensorService extends Service implements SensorEventListener {
                 }
             }
         });
-
-
-
-
-
 
     }
 
@@ -211,7 +224,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void connectToMQTT(){
         //https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-paho-android-service/
-        clientId = MqttClient.generateClientId(); //paho42344242777022
+
         Log.d(TAG, "connectToMQTT: "+clientId);
 
         client = new MqttAndroidClient(this.getApplicationContext(),"ssl://98ffc5f1d5b742ea97a55790d35f07da.s1.eu.hivemq.cloud:8883" , clientId);
@@ -269,35 +282,40 @@ public class SensorService extends Service implements SensorEventListener {
     public void subscribeToMQTT(){
 
 
-        handleBroadcast(ACTION_GLOBAL_GOAL,10000);
-        global_goal = 10000;
 
-//        String topic = "users/steps";
-//        int qos = 1;
-//        try {
-//            IMqttToken subToken = client.subscribe(topic, qos);
-//            subToken.setActionCallback(new IMqttActionListener() {
-//                @Override
-//                public void onSuccess(IMqttToken asyncActionToken) {
-//                    // The message was published
-//                }
-//
-//                @Override
-//                public void onFailure(IMqttToken asyncActionToken,
-//                                      Throwable exception) {
-//                    // The subscription could not be performed, maybe the user was not
-//                    // authorized to subscribe on the specified topic e.g. using wildcards
-//
-//                }
-//            });
-//        } catch (MqttException e) {
-//            e.printStackTrace();
-//        }
+
+
+        String topic = "users/global_goal";
+        int qos = 1;
+        try {
+            IMqttToken subToken = client.subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    handleBroadcast(ACTION_GLOBAL_GOAL,10000);
+         //           global_goal_set = true;
+//                    SharedPreferences.Editor editor = sharedpreferences.edit();
+//                    editor.putInt("global_goal", value); // Storing integer
+//                    editor.apply(); // commit changes
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken,
+                                      Throwable exception) {
+                    // The subscription could not be performed, maybe the user was not
+                    // authorized to subscribe on the specified topic e.g. using wildcards
+
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     };
 
     public void publishToMQTT(int value){
         Log.d(TAG, "pushDataToMQTT: Sending data to MQTT:"+value);
-        String topic = "users/steps";
+        String topic = "users/"+clientId+"/steps";
         String payload = Integer.toString(value);
         byte[] encodedPayload = new byte[0];
         try {
@@ -309,16 +327,12 @@ public class SensorService extends Service implements SensorEventListener {
         }
     };
 
-    public void getUserGoal(){
-        user_goal =  sharedpreferences.getInt("USER_GOAL", 5000);
-        handleBroadcast(ACTION_USER_GOAL,user_goal);
-    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
-                user_steps+=100;
+                user_steps+=50;
 //                int MULTIPLE_20 = totalCount % 20;
 //                if (MULTIPLE_20 == 0) {
 //                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);

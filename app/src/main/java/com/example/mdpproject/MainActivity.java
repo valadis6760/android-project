@@ -4,13 +4,17 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 import com.example.mdpproject.db.DBHelper;
+import com.example.mdpproject.db.DailyInfo;
+import com.example.mdpproject.service.SensorService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +27,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.mdpproject.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -31,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -40,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         if (sharedPreferences.getString("first-name", null) == null) {
             navigateToSettingsActivity();
         } else {
+            startService(new Intent(this, SensorService.class));
             BottomNavigationView navView = findViewById(R.id.nav_view);
             // Passing each menu ID as a set of Ids because each
             // menu should be considered as top level destinations.
@@ -63,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_NETWORK_STATE},
                 1);
+
+
+
+
 
     }
 

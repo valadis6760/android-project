@@ -1,17 +1,23 @@
 package com.example.mdpproject;
 
+import static android.provider.ContactsContract.Intents.Insert.ACTION;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 
+import com.example.mdpproject.service.SensorService;
 import com.example.mdpproject.utils.Gender;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -24,22 +30,26 @@ public class SettingsActivity extends AppCompatActivity {
     int height;
     int weight;
     int goal;
+    boolean text_to_speech;
 
     // Indicates whether it is the first time in the app or not
     boolean firstTime = true;
 
     private RadioGroup genderRadioGroup;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Settings");
 
         sharedPreferences = getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
         String firstName = sharedPreferences.getString("first-name", null);
         if (firstName != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             firstTime = false;
             name = firstName;
             String strGender = sharedPreferences.getString("gender", null);
@@ -101,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity {
         boolean valid = true;
         EditText firstNameEt = (EditText) findViewById(R.id.name_input);
         if (TextUtils.isEmpty(firstNameEt.getText())) {
-            firstNameEt.setError("We asked for your name, not for your bank account. Don't be a dick!");
+            firstNameEt.setError("Enter Name !");
             valid = false;
         } else {
             name = firstNameEt.getText().toString();
@@ -130,7 +140,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         EditText goalEt = (EditText) findViewById(R.id.goal_input);
         if (TextUtils.isEmpty(goalEt.getText())) {
-            goalEt.setError("If you don't have a goal it's better to download Glovo!");
+            goalEt.setError("Enter Goal !");
             valid = false;
         } else {
             goal = Integer.parseInt(goalEt.getText().toString());

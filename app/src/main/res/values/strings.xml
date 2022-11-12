@@ -24,4 +24,17 @@
     <string name="month">Month</string>
     <string name="year">Year</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="user_goal">User Goal</string>
+    <string name="global_goal">Global Goal</string>
+    <string name="zero_0">0</string>
+    <string name="user_steps">User Steps :</string>
+    <string name="calories_burned">Calories Burned :</string>
+    <string name="distance">Distance :</string>
+    <string name="user_goal_tv">User Goal :</string>
+    <string name="global_goal_tv">Global Goal :</string>
+    <string name="location_history">Location History</string>
+    <string name="week_stats">Week Stats</string>
+    <string name="overall_stats">Overall Stats</string>
+    <string name="total_steps">Total Steps :</string>
+    <string name="total_distance">Total Distance :</string>
 </resources>
