@@ -3,7 +3,6 @@ package com.example.mdpproject.ui.dashboard;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +18,14 @@ import com.example.mdpproject.activity.MapsActivity;
 import com.example.mdpproject.databinding.FragmentDashboardBinding;
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
+import com.example.mdpproject.db.MonthlyInfo;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,27 +40,26 @@ public class DashboardFragment extends Fragment {
 
     private DBHelper dbHelper;
     BarDataSet bardataset;
+    BarData data;
+    BarChart barChart;
 
     private List<BarEntry> dailyInfoList = new ArrayList<>();
     private List<BarEntry> monthlyInfoList = new ArrayList<>();
 
-    private ArrayList<DailyInfo> weekArrayList  = new ArrayList<>();
-    private ArrayList<DailyInfo> allArrayList  = new ArrayList<>();
+    private Button week;
+    private Button month;
+    private Button year;
 
-    int week_teps_value = 0;
-
-
+    int week_steps_value = 0;
     int overall_steps_value = 0;
 
+    private TextView week_user_steps;
+    private TextView week_calories_burned;
+    private TextView week_distance;
 
-
-    private TextView week_user_steps ;
-    private TextView week_calories_burned ;
-    private TextView week_distance ;
-
-    private TextView overall_user_steps ;
-    private TextView overall_calories_burned ;
-    private TextView overall_distance ;
+    private TextView overall_user_steps;
+    private TextView overall_calories_burned;
+    private TextView overall_distance;
 
     private Button LocationHistory;
 
@@ -80,8 +76,14 @@ public class DashboardFragment extends Fragment {
         year = root.findViewById(R.id.dashboard_button_year);
         LocationHistory = root.findViewById(R.id.dashboard_location_history);
 
+        barChart = (BarChart) root.findViewById(R.id.dashboard_barchart);
         barChart.getDescription().setEnabled(false);
         barChart.setDrawValueAboveBar(false);
+        barChart.setFitBars(true);
+        barChart.setDrawBarShadow(true);
+        barChart.setDrawGridBackground(false);
+        barChart.animateY(2000);
+        barChart.setAutoScaleMinMaxEnabled(true);
 
         bardataset = new BarDataSet(dailyInfoList, "Number of Steps");
         bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
@@ -94,31 +96,46 @@ public class DashboardFragment extends Fragment {
         insertDummyData();
         initializeGraphByDays(7);
 
-        // setting text color.
-        bardataset.setValueTextColor(Color.BLACK);
-
-        // setting text size
-        bardataset.setValueTextSize(16f);
+        data = new BarData(bardataset);
+        barChart.setData(data);
         barChart.getDescription().setEnabled(false);
 
-         week_user_steps = binding.dashboardWeekStepsValue ;
-       week_calories_burned = binding.dashboardWeekCaloriesValue ;
+        week_user_steps = binding.dashboardWeekStepsValue;
+        week_calories_burned = binding.dashboardWeekCaloriesValue;
         week_distance = binding.dashboardWeekDistanceValue;
 
         overall_user_steps = binding.dashboardOverallStepsValue;
-        overall_calories_burned = binding.dashboardOverallCaloriesValue ;
-     overall_distance = binding.dashboardOverallDistanceValue;
+        overall_calories_burned = binding.dashboardOverallCaloriesValue;
+        overall_distance = binding.dashboardOverallDistanceValue;
 
-
-
-        week_user_steps.setText(Integer.toString(week_teps_value));
-        week_calories_burned.setText(Float.toString(week_teps_value/100));
-        week_distance.setText(Integer.toString(week_teps_value*10));
+        week_user_steps.setText(Integer.toString(week_steps_value));
+        week_calories_burned.setText(Float.toString(week_steps_value / 100));
+        week_distance.setText(Integer.toString(week_steps_value * 10));
 
         overall_user_steps.setText(Integer.toString(overall_steps_value));
-        overall_calories_burned.setText(Float.toString(overall_steps_value/100));
-        overall_distance.setText(Float.toString(overall_steps_value*10));
+        overall_calories_burned.setText(Float.toString(overall_steps_value / 100));
+        overall_distance.setText(Float.toString(overall_steps_value * 10));
 
+        week.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                weekSelected();
+            }
+        });
+
+        month.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                monthSelected();
+            }
+        });
+
+        year.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                yearSelected();
+            }
+        });
         LocationHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,10 +146,6 @@ public class DashboardFragment extends Fragment {
 
         return root;
     }
-
-    private void setWeekData(){};
-
-    private void setOverallData(){};
 
     @Override
     public void onDestroyView() {
