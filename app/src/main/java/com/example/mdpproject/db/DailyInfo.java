@@ -12,19 +12,31 @@ public class DailyInfo {
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
 
-    private int id;
-    private String date;
-    private String steps;
+    private String id;
+    private Date date;
+    private int steps;
     private String latitude;
     private String longitude;
 
     public DailyInfo() {
-
+        this.id = UUID.randomUUID().toString();
     }
 
+    public DailyInfo(Date date, int steps, String latitude, String longitude) {
+        this.id = UUID.randomUUID().toString();
+        this.date = date;
+        this.steps = steps;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
+    public DailyInfo(Date date, int steps) {
+        this.id = UUID.randomUUID().toString();
+        this.date = date;
+        this.steps = steps;
+    }
 
-    public DailyInfo( int id,String date, String steps, String latitude, String longitude) {
+    public DailyInfo(String id, Date date, int steps, String latitude, String longitude) {
         this.id = id;
         this.date = date;
         this.steps = steps;
@@ -32,27 +44,27 @@ public class DailyInfo {
         this.longitude = longitude;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public  void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getSteps() {
+    public int getSteps() {
         return steps;
     }
 
-    public void setSteps(String steps) {
+    public void setSteps(int steps) {
         this.steps = steps;
     }
 
@@ -72,11 +84,11 @@ public class DailyInfo {
         this.longitude = longitude;
     }
 
-    public static final String CREATE_TABLE = "CREATE TABLE "+TABLE_NAME+"("
-            +COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"
-            +COLUMN_DATE+" DATETIME2,"
-            +COLUMN_STEPS+" TEXT,"
-            +COLUMN_LATITUDE+" TEXT,"
-            +COLUMN_LONGITUDE+" TEXT"
-            +")";
+    public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
+            + COLUMN_ID + " TEXT PRIMARY KEY,"
+            + COLUMN_DATE + " DATETIME2,"
+            + COLUMN_STEPS + " INTEGER,"
+            + COLUMN_LATITUDE + " TEXT,"
+            + COLUMN_LONGITUDE + " TEXT"
+            + ")";
 }

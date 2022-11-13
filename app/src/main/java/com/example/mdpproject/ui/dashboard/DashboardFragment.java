@@ -75,55 +75,24 @@ public class DashboardFragment extends Fragment {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        BarChart barChart = (BarChart) root.findViewById(R.id.dashboard_barchart);
-
+        week = root.findViewById(R.id.dashboard_button_week);
+        month = root.findViewById(R.id.dashboard_button_month);
+        year = root.findViewById(R.id.dashboard_button_year);
         LocationHistory = root.findViewById(R.id.dashboard_location_history);
 
         barChart.getDescription().setEnabled(false);
         barChart.setDrawValueAboveBar(false);
 
-        bardataset = new BarDataSet(dailyInfoList, "Number of Steps past 7 Days");
-        dbHelper = new DBHelper(this.getContext());
-        weekArrayList.addAll(dbHelper.getWeekRecords());
-
-        int spacing = 200;
-        dailyInfoList.clear();
-        monthlyInfoList.clear();
-
-        if(weekArrayList.size()>0 && allArrayList.size()>0){
-            allArrayList.addAll(dbHelper.getAllRecords());
-            for (DailyInfo dailyInfo : allArrayList) {
-                overall_steps_value += Integer.parseInt(dailyInfo.getSteps());
-            }
-
-            for (DailyInfo dailyInfo : weekArrayList) {
-                week_teps_value += Integer.parseInt(dailyInfo.getSteps());
-                dailyInfoList.add(new BarEntry(spacing, Float.parseFloat(dailyInfo.getSteps())));
-                spacing += 1000;
-            }
-        }else{
-            for(int j=0; j<7; j++){
-                dailyInfoList.add(new BarEntry(spacing, 0));
-                spacing += 1000;
-            }
-        }
-
-
-
-        bardataset.setValues(dailyInfoList);
-
-        barChart.animateY(5000);
-        barChart.getAxisLeft().setDrawLabels(false);
-        barChart.getAxisRight().setDrawLabels(false);
-        barChart.getAxisLeft().setAxisMinValue(0f);
-        barChart.getAxisRight().setAxisMinValue(0f);
-
-        BarData data = new BarData(bardataset);
-        data.setBarWidth(70);
+        bardataset = new BarDataSet(dailyInfoList, "Number of Steps");
         bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-        barChart.setData(data);
-
         bardataset.setColors(ColorTemplate.MATERIAL_COLORS);
+        bardataset.setValueTextColor(Color.BLACK);
+        bardataset.setValueTextSize(16f);
+
+        dbHelper = new DBHelper(this.getContext());
+        // TODO: Comment the above line of code after the first execution
+        insertDummyData();
+        initializeGraphByDays(7);
 
         // setting text color.
         bardataset.setValueTextColor(Color.BLACK);
@@ -158,32 +127,6 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-//        final TextView textView = binding.textDashboard;
-//        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-
-//        dbHelper.insertContact("2022-11-01 10:40:50","123","22.45","45.23");
-//        dbHelper.insertContact("2022-11-02 10:50:50","154","42.45","34.23");
-//        dbHelper.insertContact("2022-11-03 10:40:50","1634","72.45","67.23");
-//        dbHelper.insertContact("2022-11-04 10:30:50","1734","42.45","54.23");
-//        dbHelper.insertContact("2022-11-05 10:20:50","2034","32.45","34.23");
-//        dbHelper.insertContact("2022-11-06 10:10:50","2234","25.45","23.23");
-//        dbHelper.insertContact("2022-11-07 10:40:50","6234","34.45","12.23");
-//        dbHelper.insertContact("2022-11-08 10:50:50","1234","59.45","23.23");
-//        dbHelper.insertContact("2022-11-09 10:40:50","4234","38.45","31.23");
-//        dbHelper.insertContact("2022-11-10 10:30:50","7234","75.45","21.23");
-//        dbHelper.insertContact("2022-11-11 10:20:50","8234","36.45","43.23");
-//        dbHelper.insertContact("2022-11-12 10:10:50","7234","22.45","76.23");
-//        dbHelper.insertContact("2022-11-22 10:00:50","4234","73.45","89.23");
-
-
-
-
-//        contactArrayList.addAll(dbHelper.getAllRecords());
-//        for(DailyInfo x : contactArrayList) {
-//            Log.d("TABLEEEE", "onCreate: content "+x.getSteps());
-//        }
-//        Log.d("TABLEEEE", "onCreate: Total Size"+contactArrayList.size());
-
         return root;
     }
 
@@ -196,4 +139,89 @@ public class DashboardFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    private List<DailyInfo> onRangeSelect(int range) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -range);
+        Date today = new Date();
+        Date fromDate = cal.getTime();
+        try {
+            return dbHelper.getDailyInfoByDateRange(fromDate, today);
+        } catch (ParseException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void initializeGraphByDays(int days) {
+        List<DailyInfo> localDailyInfoList = onRangeSelect(days);
+        int spacing = 100;
+        dailyInfoList.clear();
+        monthlyInfoList.clear();
+        for (DailyInfo dailyInfo : localDailyInfoList) {
+            dailyInfoList.add(new BarEntry(spacing, dailyInfo.getSteps()));
+            spacing += 100;
+        }
+        bardataset.setValues(dailyInfoList);
+        barChart.notifyDataSetChanged();
+        barChart.refreshDrawableState();
+        barChart.invalidate();
+    }
+
+    public void weekSelected() {
+        initializeGraphByDays(7);
+    }
+
+    public void monthSelected() {
+        initializeGraphByDays(30);
+    }
+
+    public void yearSelected() {
+        List<DailyInfo> info = onRangeSelect(365);
+        Map<Integer, MonthlyInfo> monthlyInfoMap = new HashMap<>();
+        for (int i = 1; i <= 12; i++) {
+            monthlyInfoMap.put(i, new MonthlyInfo(i));
+        }
+        for (DailyInfo dailyInfo : info) {
+            if (dailyInfo.getDate().getYear() == new Date().getYear()) {
+                int month = dailyInfo.getDate().getMonth() + 1;
+                MonthlyInfo monthlyInfo = monthlyInfoMap.get(month);
+                monthlyInfo.setSteps(monthlyInfo.getSteps() + dailyInfo.getSteps());
+            }
+        }
+        TreeMap<Integer, MonthlyInfo> sorted = new TreeMap<>();
+        sorted.putAll(monthlyInfoMap);
+        int spacing = 100;
+        dailyInfoList.clear();
+        monthlyInfoList.clear();
+        for (Map.Entry<Integer, MonthlyInfo> entry : sorted.entrySet()) {
+            monthlyInfoList.add(new BarEntry(spacing, entry.getValue().getSteps()));
+            spacing += 100;
+        }
+        bardataset.setValues(monthlyInfoList);
+        barChart.refreshDrawableState();
+        barChart.notifyDataSetChanged();
+        barChart.invalidate();
+    }
+
+    private void insertDummyData() {
+        Date january1st = new Date(122, 0, 1);
+        Date january15th = new Date(122, 0, 15);
+        Date february1st = new Date(122, 1, 1);
+        Date february15th = new Date(122, 1, 15);
+        Date july1st = new Date(122, 6, 1);
+        Date july15th = new Date(122, 6, 15);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+        Date today = new Date();
+        dbHelper.addDailyInfo(new DailyInfo(january1st, 1000));
+        dbHelper.addDailyInfo(new DailyInfo(january15th, 2000));
+        dbHelper.addDailyInfo(new DailyInfo(february1st, 3000));
+        dbHelper.addDailyInfo(new DailyInfo(february15th, 4000));
+        dbHelper.addDailyInfo(new DailyInfo(july1st, 5000));
+        dbHelper.addDailyInfo(new DailyInfo(july15th, 6000));
+        dbHelper.addDailyInfo(new DailyInfo(yesterday, 7000));
+        dbHelper.addDailyInfo(new DailyInfo(today, 8000));
+    }
+
 }

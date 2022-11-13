@@ -16,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -39,20 +40,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
         db = new DBHelper(this);
-        allArrayList.addAll(db.getAllRecords());
+        try {
+            allArrayList.addAll(db.getAllRecords());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         LatLng last = null;
-        if(allArrayList.size()>0){
-            for(DailyInfo x : allArrayList) {
+        if (allArrayList.size() > 0) {
+            for (DailyInfo x : allArrayList) {
                 LatLng latlng = new LatLng(Double.parseDouble(x.getLatitude()), Double.parseDouble(x.getLongitude()));
-                mMap.addMarker(new MarkerOptions().position(latlng).title(x.getSteps()));
+                mMap.addMarker(new MarkerOptions().position(latlng).title(Integer.toString(x.getSteps())));
                 last = latlng;
-                Log.d("TABLEEEE", "onCreate: content "+x.getLatitude()+" - "+x.getLongitude());
+                Log.d("TABLE", "onCreate: content " + x.getLatitude() + " - " + x.getLongitude());
             }
             mMap.moveCamera(CameraUpdateFactory.newLatLng(last));
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(5));
