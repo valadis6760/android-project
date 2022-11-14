@@ -53,13 +53,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng last = null;
         if (allArrayList.size() > 0) {
             for (DailyInfo x : allArrayList) {
-                LatLng latlng = new LatLng(Double.parseDouble(x.getLatitude()), Double.parseDouble(x.getLongitude()));
-                mMap.addMarker(new MarkerOptions().position(latlng).title(Integer.toString(x.getSteps())));
-                last = latlng;
-                Log.d("TABLE", "onCreate: content " + x.getLatitude() + " - " + x.getLongitude());
+                if (x.getLatitude() != null && x.getLongitude() != null) {
+                    LatLng latlng = new LatLng(Double.parseDouble(x.getLatitude()), Double.parseDouble(x.getLongitude()));
+                    mMap.addMarker(new MarkerOptions().position(latlng).title(Integer.toString(x.getSteps())));
+                    last = latlng;
+                    Log.d("TABLE", "onCreate: content " + x.getLatitude() + " - " + x.getLongitude());
+                }
             }
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(last));
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(5));
+            if (last != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(last));
+                googleMap.animateCamera(CameraUpdateFactory.zoomTo(5));
+            } else {
+                // shonal
+            }
         }
     }
 }
