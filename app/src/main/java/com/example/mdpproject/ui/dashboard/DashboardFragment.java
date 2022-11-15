@@ -46,6 +46,7 @@ public class DashboardFragment extends Fragment {
 
     private List<BarEntry> dailyInfoList = new ArrayList<>();
     private List<BarEntry> monthlyInfoList = new ArrayList<>();
+    private List<DailyInfo> weeklyDailyInfo = new ArrayList<>();
 
     private Button week;
     private Button month;
@@ -96,8 +97,11 @@ public class DashboardFragment extends Fragment {
         bardataset.setValueTextSize(16f);
 
         dbHelper = new DBHelper(this.getContext());
-        // TODO: Comment the above line of code after the first execution
-        insertDummyData();
+        setWeeklyDailyInfoList();
+        if (weeklyDailyInfo.isEmpty()) {
+            insertDummyData();
+            setWeeklyDailyInfoList();
+        }
         weekSelected();
 
         data = new BarData(bardataset);
@@ -121,6 +125,9 @@ public class DashboardFragment extends Fragment {
         overall_user_steps.setText(Integer.toString(overall_steps_value));
         overall_calories_burned.setText(Float.toString(overall_steps_value / 100));
         overall_distance.setText(Float.toString(overall_steps_value * 10));
+
+        calculateWeekStats();
+        calculateOverallStats();
 
         week.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,6 +256,40 @@ public class DashboardFragment extends Fragment {
         barChart.invalidate();
     }
 
+    private void calculateWeekStats() {
+        int steps = 0;
+        for (DailyInfo info : weeklyDailyInfo) {
+            steps += info.getSteps();
+        }
+        week_user_steps.setText(Integer.toString(steps));
+
+        // calculate calories
+
+        // calculate distance
+    }
+
+    private void calculateOverallStats() {
+        int steps = 0;
+        List<DailyInfo> dailyInfoList = new ArrayList<>();
+        try {
+            dailyInfoList = dbHelper.getAllRecords();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        for (DailyInfo dailyInfo : dailyInfoList) {
+            steps += dailyInfo.getSteps();
+        }
+        overall_user_steps.setText(Integer.toString(steps));
+
+        // calculate calories
+
+        // calculate distance
+    }
+
+    private void setWeeklyDailyInfoList() {
+        weeklyDailyInfo = onRangeSelect(7);
+    }
+
     private void insertDummyData() {
         Date january1st = new Date(122, 0, 1);
         Date january15th = new Date(122, 0, 15);
@@ -259,7 +300,6 @@ public class DashboardFragment extends Fragment {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         Date yesterday = cal.getTime();
-        Date today = new Date();
         dbHelper.addDailyInfo(new DailyInfo(january1st, 1000));
         dbHelper.addDailyInfo(new DailyInfo(january15th, 2000));
         dbHelper.addDailyInfo(new DailyInfo(february1st, 3000));
@@ -267,7 +307,6 @@ public class DashboardFragment extends Fragment {
         dbHelper.addDailyInfo(new DailyInfo(july1st, 5000));
         dbHelper.addDailyInfo(new DailyInfo(july15th, 6000));
         dbHelper.addDailyInfo(new DailyInfo(yesterday, 7000));
-        dbHelper.addDailyInfo(new DailyInfo(today, 8000));
     }
 
 }

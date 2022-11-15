@@ -34,7 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public ArrayList<DailyInfo> getAllRecords() throws ParseException {
+    public List<DailyInfo> getAllRecords() throws ParseException {
         ArrayList<DailyInfo> dailyInfoList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + DailyInfo.TABLE_NAME + " ORDER BY " + DailyInfo.COLUMN_DATE + " DESC";
         SQLiteDatabase db = this.getWritableDatabase();
