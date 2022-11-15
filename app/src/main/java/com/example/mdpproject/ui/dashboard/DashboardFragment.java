@@ -79,12 +79,15 @@ public class DashboardFragment extends Fragment {
 
         barChart = (BarChart) root.findViewById(R.id.dashboard_barchart);
         barChart.getDescription().setEnabled(false);
-        barChart.setDrawValueAboveBar(false);
+        barChart.setDrawValueAboveBar(true);
         barChart.setFitBars(true);
         barChart.setDrawBarShadow(true);
         barChart.setDrawGridBackground(false);
-        barChart.animateY(2000);
+        barChart.animateY(1000);
         barChart.setAutoScaleMinMaxEnabled(true);
+        barChart.getAxisRight().setAxisMinimum(0f);
+        barChart.getAxisLeft().setAxisMinimum(0f);
+        barChart.getAxisLeft().setEnabled(false);
 
         bardataset = new BarDataSet(dailyInfoList, "Number of Steps");
         bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
@@ -95,11 +98,13 @@ public class DashboardFragment extends Fragment {
         dbHelper = new DBHelper(this.getContext());
         // TODO: Comment the above line of code after the first execution
         insertDummyData();
-        initializeGraphByDays(7);
+        weekSelected();
 
         data = new BarData(bardataset);
+        data.setBarWidth(30f);
+        barChart.getXAxis().setAxisMaximum(data.getXMax() + 35f);
+        barChart.getXAxis().setAxisMinimum(data.getXMin() - 35f);
         barChart.setData(data);
-        barChart.getDescription().setEnabled(false);
 
         week_user_steps = binding.dashboardWeekStepsValue;
         week_calories_burned = binding.dashboardWeekCaloriesValue;
