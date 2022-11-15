@@ -11,7 +11,7 @@
 
     <color name="grey_bg">#EBECF0</color>
 
-    <color name="custom_brown_bg">#4A2E15</color>
-    <color name="custom_brown_select">#672F16</color>
+    <color name="custom_brown_bg">#240f00</color>
+    <color name="custom_brown_select">#240f00</color>
     <color name="custom_orange">#CF4D0A</color>
 </resources>

@@ -30,21 +30,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/week" />
+                android:text="@string/week"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/dashboard_button_month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/month" />
+                android:text="@string/month"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/dashboard_button_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/year" />
+                android:text="@string/year"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
         </LinearLayout>
 
         <ScrollView
@@ -261,6 +267,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10sp"
-        android:text="@string/location_history" />
+        android:text="@string/location_history"
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
