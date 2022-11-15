@@ -167,18 +167,38 @@ public class DashboardFragment extends Fragment {
 
     public void initializeGraphByDays(int days) {
         List<DailyInfo> localDailyInfoList = onRangeSelect(days);
+
         int spacing = 100;
         dailyInfoList.clear();
         monthlyInfoList.clear();
-        if (localDailyInfoList.size() < 7) {
-            for (int i = 7; i > localDailyInfoList.size(); i--) {
+
+        // If the list is empty (it's the first time using the app)
+        if (localDailyInfoList.size() == 0) {
+            for (int i = 1; i <= 7; i++) {
                 dailyInfoList.add(new BarEntry(spacing, 0));
                 spacing += 100;
             }
-        }
-        for (DailyInfo dailyInfo : localDailyInfoList) {
-            dailyInfoList.add(new BarEntry(spacing, dailyInfo.getSteps()));
-            spacing += 100;
+        } else {
+            // If there are records on the database
+            Map<Integer, DailyInfo> dailyInfoMap = new HashMap<>();
+            Calendar cal = Calendar.getInstance();
+            for (int i = 1; i <= 7; i++) {
+                cal.add(Calendar.DATE, -i);
+                Date tempDate = cal.getTime();
+                for (DailyInfo info : localDailyInfoList) {
+                    if (tempDate.getDate() == info.getDate().getDate() && tempDate.getMonth() == info.getDate().getMonth()) {
+                        dailyInfoMap.put(i, info);
+                    } else {
+                        dailyInfoMap.put(i, new DailyInfo());
+                    }
+                }
+            }
+            TreeMap<Integer, DailyInfo> sorted = new TreeMap<>();
+            sorted.putAll(dailyInfoMap);
+            for (Map.Entry<Integer, DailyInfo> entry : sorted.entrySet()) {
+                dailyInfoList.add(new BarEntry(spacing, entry.getValue().getSteps()));
+                spacing += 100;
+            }
         }
         bardataset.setValues(dailyInfoList);
         barChart.notifyDataSetChanged();
