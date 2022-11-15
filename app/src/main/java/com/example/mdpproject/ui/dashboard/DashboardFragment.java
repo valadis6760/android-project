@@ -28,6 +28,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -185,15 +186,16 @@ public class DashboardFragment extends Fragment {
             for (int i = 1; i <= 7; i++) {
                 cal.add(Calendar.DATE, -i);
                 Date tempDate = cal.getTime();
+                dailyInfoMap.put(i, new DailyInfo());
                 for (DailyInfo info : localDailyInfoList) {
                     if (tempDate.getDate() == info.getDate().getDate() && tempDate.getMonth() == info.getDate().getMonth()) {
                         dailyInfoMap.put(i, info);
-                    } else {
-                        dailyInfoMap.put(i, new DailyInfo());
+                        break;
                     }
                 }
+                cal.setTime(new Date());
             }
-            TreeMap<Integer, DailyInfo> sorted = new TreeMap<>();
+            Map<Integer, DailyInfo> sorted = new TreeMap<>(Collections.reverseOrder());
             sorted.putAll(dailyInfoMap);
             for (Map.Entry<Integer, DailyInfo> entry : sorted.entrySet()) {
                 dailyInfoList.add(new BarEntry(spacing, entry.getValue().getSteps()));
