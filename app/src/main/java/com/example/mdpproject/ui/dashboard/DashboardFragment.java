@@ -170,6 +170,12 @@ public class DashboardFragment extends Fragment {
         int spacing = 100;
         dailyInfoList.clear();
         monthlyInfoList.clear();
+        if (localDailyInfoList.size() < 7) {
+            for (int i = 7; i > localDailyInfoList.size(); i--) {
+                dailyInfoList.add(new BarEntry(spacing, 0));
+                spacing += 100;
+            }
+        }
         for (DailyInfo dailyInfo : localDailyInfoList) {
             dailyInfoList.add(new BarEntry(spacing, dailyInfo.getSteps()));
             spacing += 100;

@@ -11,23 +11,26 @@ public class DailyInfo {
     public static final String COLUMN_STEPS = "steps";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_GOAL_REACHED = "goal_reached";
 
     private String id;
     private Date date;
     private int steps;
     private String latitude;
     private String longitude;
+    private boolean goalReached;
 
     public DailyInfo() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public DailyInfo(Date date, int steps, String latitude, String longitude) {
+    public DailyInfo(Date date, int steps, String latitude, String longitude, boolean goalReached) {
         this.id = UUID.randomUUID().toString();
         this.date = date;
         this.steps = steps;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.goalReached = goalReached;
     }
 
     public DailyInfo(Date date, int steps) {
@@ -36,12 +39,13 @@ public class DailyInfo {
         this.steps = steps;
     }
 
-    public DailyInfo(String id, Date date, int steps, String latitude, String longitude) {
+    public DailyInfo(String id, Date date, int steps, String latitude, String longitude, boolean goal_reached) {
         this.id = id;
         this.date = date;
         this.steps = steps;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.goalReached = goal_reached;
     }
 
     public String getId() {
@@ -84,11 +88,20 @@ public class DailyInfo {
         this.longitude = longitude;
     }
 
+    public boolean isGoalReached() {
+        return goalReached;
+    }
+
+    public void setGoalReached(boolean goalReached) {
+        this.goalReached = goalReached;
+    }
+
     public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " TEXT PRIMARY KEY,"
             + COLUMN_DATE + " DATETIME2,"
             + COLUMN_STEPS + " INTEGER,"
             + COLUMN_LATITUDE + " TEXT,"
-            + COLUMN_LONGITUDE + " TEXT"
+            + COLUMN_LONGITUDE + " TEXT,"
+            + COLUMN_GOAL_REACHED + " INTEGER"
             + ")";
 }

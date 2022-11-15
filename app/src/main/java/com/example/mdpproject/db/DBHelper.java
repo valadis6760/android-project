@@ -58,11 +58,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public void addDailyInfo(DailyInfo dailyInfo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("id", dailyInfo.getId());
-        values.put("date", dt.format(dailyInfo.getDate()));
-        values.put("steps", dailyInfo.getSteps());
-        values.put("latitude", dailyInfo.getLatitude());
-        values.put("longitude", dailyInfo.getLongitude());
+        values.put(DailyInfo.COLUMN_ID, dailyInfo.getId());
+        values.put(DailyInfo.COLUMN_DATE, dt.format(dailyInfo.getDate()));
+        values.put(DailyInfo.COLUMN_STEPS, dailyInfo.getSteps());
+        values.put(DailyInfo.COLUMN_LATITUDE, dailyInfo.getLatitude());
+        values.put(DailyInfo.COLUMN_LONGITUDE, dailyInfo.getLongitude());
+        values.put(DailyInfo.COLUMN_GOAL_REACHED, dailyInfo.isGoalReached() ? 1 : 0);
 
         db.insert(DailyInfo.TABLE_NAME, null, values);
         db.close();
@@ -71,7 +72,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public DailyInfo getDailyInfoByDate(Date date) throws ParseException {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(DailyInfo.TABLE_NAME, new String[]{"id", "date", "steps", "latitude", "longitude"}, "date=?",
+        Cursor cursor = db.query(DailyInfo.TABLE_NAME, new String[]{
+                DailyInfo.COLUMN_ID,
+                DailyInfo.COLUMN_DATE,
+                DailyInfo.COLUMN_STEPS,
+                DailyInfo.COLUMN_LATITUDE,
+                DailyInfo.COLUMN_LONGITUDE,
+                DailyInfo.COLUMN_GOAL_REACHED}, "date=?",
                 new String[]{dt.format(date)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -80,8 +87,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 cursor.getString(0),
                 dt.parse(cursor.getString(1)),
                 Integer.parseInt(cursor.getString(2)),
+                cursor.getString(3),
                 cursor.getString(4),
-                cursor.getString(5)
+                1 >= cursor.getInt(5)
         );
         return dailyInfo;
     }
@@ -89,7 +97,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public List<DailyInfo> getDailyInfoByDateRange(Date fromDate, Date toDate) throws ParseException {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(DailyInfo.TABLE_NAME, new String[]{"id", "date", "steps", "latitude", "longitude"}, "date between ? and ?",
+        Cursor cursor = db.query(DailyInfo.TABLE_NAME, new String[]{
+                        DailyInfo.COLUMN_ID,
+                        DailyInfo.COLUMN_DATE,
+                        DailyInfo.COLUMN_STEPS,
+                        DailyInfo.COLUMN_LATITUDE,
+                        DailyInfo.COLUMN_LONGITUDE,
+                        DailyInfo.COLUMN_GOAL_REACHED}, "date between ? and ?",
                 new String[]{dt.format(fromDate), dt.format(toDate)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -101,12 +115,26 @@ public class DBHelper extends SQLiteOpenHelper {
                 dailyInfo.setId(cursor.getString(0));
                 dailyInfo.setDate(dt.parse(cursor.getString(1)));
                 dailyInfo.setSteps(Integer.parseInt(cursor.getString(2)));
-                dailyInfo.setId(cursor.getString(3));
-                dailyInfo.setId(cursor.getString(4));
+                dailyInfo.setLatitude(cursor.getString(3));
+                dailyInfo.setLongitude(cursor.getString(4));
+                dailyInfo.setGoalReached(1 >= cursor.getInt(5));
                 dailyInfoList.add(dailyInfo);
             } while (cursor.moveToNext());
         }
 
         return dailyInfoList;
+    }
+
+    public void updateDailyInfo(DailyInfo dailyInfo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DailyInfo.COLUMN_DATE, dt.format(dailyInfo.getDate()));
+        values.put(DailyInfo.COLUMN_STEPS, dailyInfo.getSteps());
+        values.put(DailyInfo.COLUMN_LATITUDE, dailyInfo.getLatitude());
+        values.put(DailyInfo.COLUMN_LONGITUDE, dailyInfo.getLongitude());
+        values.put(DailyInfo.COLUMN_GOAL_REACHED, dailyInfo.isGoalReached() ? 1 : 0);
+
+        db.update(DailyInfo.TABLE_NAME, values, "id = ?" , new String[] { dailyInfo.getId() });
+        db.close();
     }
 }
