@@ -93,7 +93,7 @@ public class DashboardFragment extends Fragment {
 
         dbHelper = new DBHelper(this.getContext());
         // TODO: Comment the above line of code after the first execution
-        insertDummyData();
+       insertDummyData();
         initializeGraphByDays(7);
 
         data = new BarData(bardataset);
