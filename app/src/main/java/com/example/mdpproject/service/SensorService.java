@@ -138,6 +138,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     void updateSensorValue(int value) {
+        SharedPreferences.Editor editor = sharedpreferences.edit();
 
         if(user_steps>=user_goal&&!user_goal_complete){
             Location location = getCurrentLocation();
@@ -159,13 +160,10 @@ public class SensorService extends Service implements SensorEventListener {
         int MULTIPLE_2 = (per/10) % 2;
                         if (MULTIPLE_2 == 0&& (per%10)==0 && text_to_speak_threshold==per && per != 100) {
                             text_to_speak_threshold +=20;
+                            editor.putInt("text_to_speak_threshold", text_to_speak_threshold); // Storing integer
                             Log.d(TAG, "updateSensorValue: TEXT TO SPEACH "+per);
                             t1.speak("You have reached "+per+" %", TextToSpeech.QUEUE_FLUSH, null);
                 }
-
-
-
-        SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putInt("sensor_step", value); // Storing integer
         editor.apply(); // commit changes
     }
@@ -195,6 +193,9 @@ public class SensorService extends Service implements SensorEventListener {
         user_steps = sharedpreferences.getInt("sensor_step", 0);
         global_goal = sharedpreferences.getInt("global_goal", 0);
         user_goal = sharedpreferences.getInt("goal",0);
+        text_to_speak_threshold = sharedpreferences.getInt("text_to_speak_threshold",20);
+
+
 
         Log.d(TAG, "onCreate: STEPSSSSSSS" + user_steps);
 

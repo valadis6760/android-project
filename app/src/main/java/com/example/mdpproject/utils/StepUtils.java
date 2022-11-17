@@ -11,27 +11,27 @@ public class StepUtils {
         return bd.doubleValue();
     }
 
-    public int getPercent(int steps, int goal) {
+    public  static int getPercent(int steps, int goal) {
         return ((int) Math.floor(((float) steps / (float) goal) * 100f));
     };
 
-    public String getPercentToString(int steps, int goal) {
+    public static String getPercentToString(int steps, int goal) {
         return ((int) Math.floor(((float) steps / (float) goal) * 100f)+"%");
     };
 
-    public double getCaloriesBurnt(int steps) {
+    public static double getCaloriesBurnt(int steps) {
         return (round(steps / 20));
     };
 
-    public String getCaloriesBurntToString(int steps) {
+    public static String getCaloriesBurntToString(int steps) {
         return (round((steps / 20))+" kcal");
     };
 
 
-    public double getDistance(int steps, int height) {
+    public  static double getDistance(int steps, int height) {
         return (((0.414 * height) * steps) / 100000);
     }
-    public String getDistanceToString(int steps, int height) {
+    public static String getDistanceToString(int steps, int height) {
         return (round(((0.414 * height) * steps) / 100000)+" Km");
     }
 }

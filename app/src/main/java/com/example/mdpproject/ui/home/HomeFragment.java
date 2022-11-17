@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
     int user_height;
     int global_goal;
     boolean global_goal_set = false;
-    StepUtils stepUtils;
+
 
     private final BroadcastReceiver mSensorUpdateReciver = new BroadcastReceiver() {
         @Override
@@ -58,11 +58,11 @@ public class HomeFragment extends Fragment {
                 case SensorService.ACTION_STEP_VALUE:
                     steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
                     userGoalProgressBar.setProgress(steps);
-                    percentTextView.setText(stepUtils.getPercentToString(steps,user_goal));
+                    percentTextView.setText(StepUtils.getPercentToString(steps,user_goal));
                     if(global_goal_set)globalGoalProgressBar.setProgress(steps);
                     stepsTextView.setText(Integer.toString(steps));
-                    distanceTextView.setText(stepUtils.getDistanceToString(steps,user_height));
-                    caloriesTextView.setText(stepUtils.getCaloriesBurntToString(steps));
+                    distanceTextView.setText(StepUtils.getDistanceToString(steps,user_height));
+                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(steps));
                     break;
 
                 case SensorService.ACTION_GLOBAL_GOAL:
@@ -110,6 +110,7 @@ public class HomeFragment extends Fragment {
         getUserData();
 
 
+
         return root;
     }
 
@@ -145,13 +146,19 @@ public class HomeFragment extends Fragment {
         global_goal_set = sharedPreferences.getBoolean("global_goal_set", false);
         global_goal = sharedPreferences.getInt("global_goal", 0);
 
+
         userGoalProgressBar.setProgressMax(user_goal);
+        userGoalProgressBar.setProgress(steps);
 
-        if(global_goal_set)globalGoalProgressBar.setMax(global_goal);
+        if(global_goal_set){
+            globalGoalProgressBar.setMax(global_goal);
+            globalGoalProgressBar.setProgress(steps);
+        }
 
+        percentTextView.setText(StepUtils.getPercentToString(steps,user_goal));
         stepsTextView.setText(Integer.toString(steps));
-        caloriesTextView.setText("0.18 kcal");
-        distanceTextView.setText("10 Km");
+        caloriesTextView.setText(StepUtils.getCaloriesBurntToString(steps));
+        distanceTextView.setText(StepUtils.getDistanceToString(steps,user_height));
         userGoalTextView.setText(Integer.toString(user_goal));
         globalGoalTextView.setText(Integer.toString(global_goal));
     }
