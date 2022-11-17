@@ -105,7 +105,7 @@ public class SensorService extends Service implements SensorEventListener {
             final String action = intent.getAction();
             Log.d(TAG, "onReceive: " + action);
             if (AlarmReceiver.ACTION_ALARM_SET.equals(action)) {
-                //persistData();
+                persistData();
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
                 user_goal_complete = false;
@@ -174,6 +174,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void onCreate() {
         sharedpreferences = getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
+        dbHelper = new DBHelper(this.getApplicationContext());
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);

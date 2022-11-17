@@ -71,26 +71,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DailyInfo getDailyInfoByDate(Date date) throws ParseException {
         SQLiteDatabase db = this.getReadableDatabase();
+        DailyInfo dailyInfo = null;
 
         Cursor cursor = db.query(DailyInfo.TABLE_NAME, new String[]{
-                DailyInfo.COLUMN_ID,
-                DailyInfo.COLUMN_DATE,
-                DailyInfo.COLUMN_STEPS,
-                DailyInfo.COLUMN_LATITUDE,
-                DailyInfo.COLUMN_LONGITUDE,
-                DailyInfo.COLUMN_GOAL_REACHED}, "date=?",
+                        DailyInfo.COLUMN_ID,
+                        DailyInfo.COLUMN_DATE,
+                        DailyInfo.COLUMN_STEPS,
+                        DailyInfo.COLUMN_LATITUDE,
+                        DailyInfo.COLUMN_LONGITUDE,
+                        DailyInfo.COLUMN_GOAL_REACHED}, "date=?",
                 new String[]{dt.format(date)}, null, null, null, null);
-        if (cursor != null)
+        if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
-        DailyInfo dailyInfo = new DailyInfo(
-                cursor.getString(0),
-                dt.parse(cursor.getString(1)),
-                Integer.parseInt(cursor.getString(2)),
-                cursor.getString(3),
-                cursor.getString(4),
-                1 >= cursor.getInt(5)
-        );
+            dailyInfo = new DailyInfo(
+                    cursor.getString(0),
+                    dt.parse(cursor.getString(1)),
+                    Integer.parseInt(cursor.getString(2)),
+                    cursor.getString(3),
+                    cursor.getString(4),
+                    1 >= cursor.getInt(5)
+            );
+        }
         return dailyInfo;
     }
 
@@ -134,7 +136,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(DailyInfo.COLUMN_LONGITUDE, dailyInfo.getLongitude());
         values.put(DailyInfo.COLUMN_GOAL_REACHED, dailyInfo.isGoalReached() ? 1 : 0);
 
-        db.update(DailyInfo.TABLE_NAME, values, "id = ?" , new String[] { dailyInfo.getId() });
+        db.update(DailyInfo.TABLE_NAME, values, "id = ?", new String[]{dailyInfo.getId()});
         db.close();
     }
 }
