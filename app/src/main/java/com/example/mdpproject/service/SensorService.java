@@ -32,6 +32,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.example.mdpproject.db.DBHelper;
+import com.example.mdpproject.db.DailyInfo;
 import com.example.mdpproject.receiver.AlarmReceiver;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -45,7 +47,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class SensorService extends Service implements SensorEventListener {
@@ -60,6 +64,7 @@ public class SensorService extends Service implements SensorEventListener {
     private boolean global_goal_set = false;
 
     MqttAndroidClient client;
+    DBHelper dbHelper;
     String clientId;
 
     SharedPreferences sharedpreferences;
@@ -100,14 +105,14 @@ public class SensorService extends Service implements SensorEventListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            Log.d(TAG, "onReceive: "+action);
+            Log.d(TAG, "onReceive: " + action);
             if (AlarmReceiver.ACTION_ALARM_SET.equals(action)) {
+                persistData();
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
                 user_goal_complete = false;
                 user_global_goal_complete= false;
                 updateSensorValue(user_steps);
-                //create databse
             }
 
 
@@ -115,14 +120,43 @@ public class SensorService extends Service implements SensorEventListener {
         }
     };
 
+    private void persistData() {
+        DailyInfo dailyInfo;
+        try {
+            dailyInfo = dbHelper.getDailyInfoByDate(new Date());
+            if (dailyInfo != null) {
+                dailyInfo.setSteps(user_steps);
+                dbHelper.updateDailyInfo(dailyInfo);
+            } else {
+                dailyInfo = new DailyInfo();
+                dailyInfo.setSteps(user_steps);
+                dailyInfo.setDate(new Date());
+                dbHelper.addDailyInfo(dailyInfo);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            dailyInfo = new DailyInfo();
+            dailyInfo.setSteps(user_steps);
+            dailyInfo.setDate(new Date());
+            dbHelper.addDailyInfo(dailyInfo);
+        }
+    }
+
     void updateSensorValue(int value) {
 
         if(user_steps>=user_goal&&!user_goal_complete){
             Location location = getCurrentLocation();
             user_goal_complete = true;
             t1.speak("Congratulations on Completing your Goal", TextToSpeech.QUEUE_FLUSH, null);
-            Log.d(TAG, "GOAL COMPLETE: "+location);
+            Log.d(TAG, "GOAL COMPLETE: " + location);
 
+            DailyInfo dailyInfo = new DailyInfo();
+            dailyInfo.setGoalReached(true);
+            dailyInfo.setDate(new Date());
+            dailyInfo.setLongitude(String.valueOf(location.getLongitude()));
+            dailyInfo.setLatitude(String.valueOf(location.getLatitude()));
+            dailyInfo.setSteps(user_steps);
+            dbHelper.addDailyInfo(dailyInfo);
         }
 
         int per = (int)Math.floor(((float)user_steps/(float)user_goal)* 100f);
