@@ -13,11 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,6 +23,7 @@ import com.example.mdpproject.R;
 import com.example.mdpproject.databinding.FragmentHomeBinding;
 import com.example.mdpproject.service.SensorService;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+
 
 public class HomeFragment extends Fragment {
 
@@ -61,8 +59,8 @@ public class HomeFragment extends Fragment {
                     percentTextView.setText((int)Math.floor(((float)steps/(float)user_goal)* 100f)+"%");
                     if(isGlobalSet)simpleProgressBar.setProgress(steps);
                     stepsTextView.setText(Integer.toString(steps));
-                    distanceTextView.setText(Integer.toString((user_height*steps)/1000));
-                    caloriesTextView.setText(Double.toString((0.04*steps)/1000.00));
+                    distanceTextView.setText(Double.toString(((0.414*user_height)*steps)/100000)+ " Km");
+                    caloriesTextView.setText(Double.toString((steps/20))+" kcal");
                     break;
 
                 case SensorService.ACTION_GLOBAL_GOAL:
@@ -86,7 +84,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-       // getActivity().startService(new Intent(getActivity(), SensorService.class));
+
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
 
@@ -114,13 +112,27 @@ public class HomeFragment extends Fragment {
 
 
         nameTextView.setText(sharedPreferences.getString("first-name", null));
+        steps = sharedPreferences.getInt("sensor_step", 0);
         user_goal = sharedPreferences.getInt("goal", 0);
         user_height =   sharedPreferences.getInt("height", 0);
         global_goal = sharedPreferences.getInt("global_goal", 0);
-        circularProgressBar.setProgressMax(user_goal);
 
+        circularProgressBar.setProgressMax(user_goal);
+        simpleProgressBar.setMax(10000);
+
+        stepsTextView.setText(Integer.toString(steps));
         userGoalTextView.setText(Integer.toString(user_goal));
         globalGoalTextView.setText(Integer.toString(global_goal));
+
+
+        circularProgressBar.setProgress(3650);
+        percentTextView.setText("60%");
+       simpleProgressBar.setProgress(3650);
+        stepsTextView.setText("3650");
+        distanceTextView.setText("2.2 Km");
+        caloriesTextView.setText("0.18 kcal");
+        userGoalTextView.setText("6000");
+        globalGoalTextView.setText("10000");
         return root;
     }
 

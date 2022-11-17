@@ -84,8 +84,6 @@ public class SensorService extends Service implements SensorEventListener {
             "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
     public final static String EXTRA_DATA_VALUE =
             "com.example.mdpproject.service.EXTRA_DATA_VALUE";
-    public final static String SET_TEXT_TO_SPEECH =
-            "com.example.mdpproject.service.SET_TEXT_TO_SPEECH";
 
     public SensorService() {
     }
@@ -114,10 +112,7 @@ public class SensorService extends Service implements SensorEventListener {
                 user_global_goal_complete= false;
                 updateSensorValue(user_steps);
             }
-
-
-
-        }
+ }
     };
 
     private void persistData() {
@@ -205,7 +200,7 @@ public class SensorService extends Service implements SensorEventListener {
 
         //getCurrentLocation();
 
-        connectToMQTT();
+        //connectToMQTT();
         createAlarm();
 
         t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {

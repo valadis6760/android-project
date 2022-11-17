@@ -106,7 +106,6 @@ public class Parser extends AsyncTask<Void,Void,Boolean> {
                                 String[] splitted = (all.split("</div><div>"));
                                 content =  splitted[1].replace("</div>"," ");
                                 item.setImageSrc(imageurl);
-
                                 item.setContent(content.substring(0,88)+ Html.fromHtml("<b>... See More</b>"));
 
                             }
