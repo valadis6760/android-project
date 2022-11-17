@@ -105,7 +105,7 @@ public class SensorService extends Service implements SensorEventListener {
             final String action = intent.getAction();
             Log.d(TAG, "onReceive: " + action);
             if (AlarmReceiver.ACTION_ALARM_SET.equals(action)) {
-                persistData();
+                //persistData();
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
                 user_goal_complete = false;
@@ -242,8 +242,8 @@ public class SensorService extends Service implements SensorEventListener {
         int DATA_FETCHER_RC = 123;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 11);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 50);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
