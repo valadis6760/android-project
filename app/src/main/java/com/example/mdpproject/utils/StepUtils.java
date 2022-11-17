@@ -15,9 +15,18 @@ public class StepUtils {
         return ((int) Math.floor(((float) steps / (float) goal) * 100f));
     };
 
+    public String getPercentToString(int steps, int goal) {
+        return ((int) Math.floor(((float) steps / (float) goal) * 100f)+"%");
+    };
+
     public double getCaloriesBurnt(int steps) {
         return (round(steps / 20));
     };
+
+    public String getCaloriesBurntToString(int steps) {
+        return (round((steps / 20))+" kcal");
+    };
+
 
     public double getDistance(int steps, int height) {
         return (((0.414 * height) * steps) / 100000);

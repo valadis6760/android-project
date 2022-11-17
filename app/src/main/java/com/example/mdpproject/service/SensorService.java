@@ -286,14 +286,6 @@ public class SensorService extends Service implements SensorEventListener {
                     Log.d(TAG, "MQTT CONNECT onSuccess");
                     subscribeToMQTT();
 
-
-//                    handler.postDelayed(new Runnable() {
-//                        public void run() {
-//                            System.out.println("myHandler: here!"); // Do your work here
-//                            publishToMQTT(user_steps);
-//                            handler.postDelayed(this, delay);
-//                        }
-//                    }, delay);
                 }
 
                 @Override
@@ -329,7 +321,8 @@ public class SensorService extends Service implements SensorEventListener {
              handleBroadcast(ACTION_GLOBAL_GOAL,data);
                        global_goal_set = true;
                     SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putInt("global_goal", data); // Storing integer
+                    editor.putInt("global_goal", data);
+                    editor.putBoolean("global_goal_set", true);
                     editor.apply(); // commit changes
         }
 
