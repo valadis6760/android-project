@@ -207,7 +207,7 @@ public class SensorService extends Service implements SensorEventListener {
 
         //getCurrentLocation();
 
-        //connectToMQTT();
+        connectToMQTT();
         createAlarm();
 
         t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -249,8 +249,8 @@ public class SensorService extends Service implements SensorEventListener {
         int DATA_FETCHER_RC = 123;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 5);
+        calendar.set(Calendar.HOUR_OF_DAY, 20);
+        calendar.set(Calendar.MINUTE, 35);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
@@ -391,7 +391,7 @@ public class SensorService extends Service implements SensorEventListener {
                 user_steps+=50;
 
                 updateSensorValue(user_steps);
-                //publishToMQTT(user_steps);
+                publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE,user_steps);
                 Log.d(TAG, "onSensorChanged: "+user_steps);
                 break;
