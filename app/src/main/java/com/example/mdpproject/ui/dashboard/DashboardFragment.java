@@ -1,6 +1,8 @@
 package com.example.mdpproject.ui.dashboard;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import com.example.mdpproject.databinding.FragmentDashboardBinding;
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
 import com.example.mdpproject.db.MonthlyInfo;
+import com.example.mdpproject.utils.StepUtils;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -66,6 +69,9 @@ public class DashboardFragment extends Fragment {
 
     private Button LocationHistory;
 
+    SharedPreferences sharedPreferences;
+    int user_height;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         DashboardViewModel dashboardViewModel =
@@ -73,6 +79,9 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        sharedPreferences = this.getActivity().getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
+        user_height =   sharedPreferences.getInt("height", 0);
 
         week = root.findViewById(R.id.dashboard_button_week);
         month = root.findViewById(R.id.dashboard_button_month);
@@ -119,14 +128,6 @@ public class DashboardFragment extends Fragment {
         overall_user_steps = binding.dashboardOverallStepsValue;
         overall_calories_burned = binding.dashboardOverallCaloriesValue;
         overall_distance = binding.dashboardOverallDistanceValue;
-
-        week_user_steps.setText(Integer.toString(week_steps_value));
-        week_calories_burned.setText(Float.toString(week_steps_value / 100));
-        week_distance.setText(Integer.toString(week_steps_value * 10));
-
-        overall_user_steps.setText(Integer.toString(overall_steps_value));
-        overall_calories_burned.setText(Float.toString(overall_steps_value / 100));
-        overall_distance.setText(Float.toString(overall_steps_value * 10));
 
         calculateWeekStats();
         calculateOverallStats();
@@ -270,10 +271,8 @@ public class DashboardFragment extends Fragment {
             steps += info.getSteps();
         }
         week_user_steps.setText(Integer.toString(steps));
-
-        // calculate calories
-
-        // calculate distance
+        week_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
+        week_distance.setText(StepUtils.getDistanceToString(steps,user_height));
     }
 
     private void calculateOverallStats() {
@@ -288,10 +287,8 @@ public class DashboardFragment extends Fragment {
             steps += dailyInfo.getSteps();
         }
         overall_user_steps.setText(Integer.toString(steps));
-
-        // calculate calories
-
-        // calculate distance
+        overall_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
+        overall_distance.setText(StepUtils.getDistanceToString(steps,user_height));
     }
 
     private void setWeeklyDailyInfoList() {

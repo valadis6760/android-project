@@ -82,8 +82,11 @@ public class SensorService extends Service implements SensorEventListener {
             "com.example.mdpproject.service.ACTION_USER_GOAL";
     public final static String ACTION_GLOBAL_GOAL =
             "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
+    public final static String ACTION_ALARM =
+            "com.example.mdpproject.service.ACTION_ALARM";
     public final static String EXTRA_DATA_VALUE =
             "com.example.mdpproject.service.EXTRA_DATA_VALUE";
+
 
     public SensorService() {
     }
@@ -110,7 +113,9 @@ public class SensorService extends Service implements SensorEventListener {
                 user_steps = 0;
                 user_goal_complete = false;
                 user_global_goal_complete= false;
+                text_to_speak_threshold=20;
                 updateSensorValue(user_steps);
+                handleBroadcast(ACTION_ALARM,0);
             }
  }
     };
@@ -244,8 +249,8 @@ public class SensorService extends Service implements SensorEventListener {
         int DATA_FETCHER_RC = 123;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 50);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 5);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);

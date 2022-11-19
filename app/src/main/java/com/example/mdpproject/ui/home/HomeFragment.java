@@ -73,6 +73,16 @@ public class HomeFragment extends Fragment {
                     Log.d(TAG, "handleBroadcast: Action ="+action+" Value:"+global_goal);
                     break;
 
+                case SensorService.ACTION_ALARM:
+                    steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
+                    userGoalProgressBar.setProgress(0);
+                    percentTextView.setText(StepUtils.getPercentToString(steps,user_goal));
+                    if(global_goal_set)globalGoalProgressBar.setProgress(steps);
+                    stepsTextView.setText(Integer.toString(steps));
+                    distanceTextView.setText(StepUtils.getDistanceToString(steps,user_height));
+                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(steps));
+                    break;
+
             }
         }
     };
@@ -135,6 +145,7 @@ public class HomeFragment extends Fragment {
         intentFilter.addAction(SensorService.ACTION_STEP_VALUE);
         intentFilter.addAction(SensorService.ACTION_USER_GOAL);
         intentFilter.addAction(SensorService.ACTION_GLOBAL_GOAL);
+        intentFilter.addAction(SensorService.ACTION_ALARM);
         return intentFilter;
     }
 
