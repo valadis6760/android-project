@@ -2,7 +2,6 @@ package com.example.mdpproject.service;
 
 import static android.content.ContentValues.TAG;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,25 +11,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
@@ -72,7 +61,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     LocationManager locationManager;
 
-    int text_to_speak_threshold=20;
+    int text_to_speak_threshold = 20;
 
     TextToSpeech t1;
 
@@ -112,12 +101,12 @@ public class SensorService extends Service implements SensorEventListener {
                 Log.d(TAG, "Alarm Set In Service !");
                 user_steps = 0;
                 user_goal_complete = false;
-                user_global_goal_complete= false;
-                text_to_speak_threshold=20;
+                user_global_goal_complete = false;
+                text_to_speak_threshold = 20;
                 updateSensorValue(user_steps);
-                handleBroadcast(ACTION_ALARM,0);
+                handleBroadcast(ACTION_ALARM, 0);
             }
- }
+        }
     };
 
     private void persistData() {
@@ -143,9 +132,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     void updateSensorValue(int value) {
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-        if(user_steps>=user_goal&&!user_goal_complete){
+        if (user_steps >= user_goal && !user_goal_complete) {
             Location location = getCurrentLocation();
             user_goal_complete = true;
             t1.speak("Congratulations on Completing your Goal", TextToSpeech.QUEUE_FLUSH, null);
@@ -160,15 +147,14 @@ public class SensorService extends Service implements SensorEventListener {
             dbHelper.addDailyInfo(dailyInfo);
         }
 
-        int per = (int)Math.floor(((float)user_steps/(float)user_goal)* 100f);
-        Log.d(TAG, "updateSensorValue: PERCENTTTTT "+per);
-        int MULTIPLE_2 = (per/10) % 2;
-                        if (MULTIPLE_2 == 0&& (per%10)==0 && text_to_speak_threshold==per && per != 100) {
-                            text_to_speak_threshold +=20;
-                            editor.putInt("text_to_speak_threshold", text_to_speak_threshold); // Storing integer
-                            Log.d(TAG, "updateSensorValue: TEXT TO SPEACH "+per);
-                            t1.speak("You have reached "+per+" %", TextToSpeech.QUEUE_FLUSH, null);
-                }
+        int percentage = (int) Math.floor(((float) user_steps / (float) user_goal) * 100f);
+        Log.d(TAG, "updateSensorValue: PERCENT " + percentage);
+        if (percentage % 20 == 0 && percentage < 100) {
+            text_to_speak_threshold = percentage + 20;
+            editor.putInt("text_to_speak_threshold", text_to_speak_threshold); // Storing integer
+            Log.d(TAG, "updateSensorValue: TEXT TO SPEECH " + percentage);
+            t1.speak("You have reached " + percentage + " %", TextToSpeech.QUEUE_FLUSH, null);
+        }
         editor.putInt("sensor_step", value); // Storing integer
         editor.apply(); // commit changes
     }
@@ -183,37 +169,30 @@ public class SensorService extends Service implements SensorEventListener {
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
 
-
         registerReceiver(broadcastReceiver, new IntentFilter(AlarmReceiver.ACTION_ALARM_SET));
-
 
         getSystemService(Context.LOCATION_SERVICE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-
         clientId = MqttClient.generateClientId(); //paho42344242777022
         //subscribeToMQTT();
 
-
         user_steps = sharedpreferences.getInt("sensor_step", 0);
         global_goal = sharedpreferences.getInt("global_goal", 0);
-        user_goal = sharedpreferences.getInt("goal",0);
-        text_to_speak_threshold = sharedpreferences.getInt("text_to_speak_threshold",20);
-
-
+        user_goal = sharedpreferences.getInt("goal", 0);
+        text_to_speak_threshold = sharedpreferences.getInt("text_to_speak_threshold", 20);
 
         Log.d(TAG, "onCreate: STEPSSSSSSS" + user_steps);
-
 
         //getCurrentLocation();
 
         connectToMQTT();
         createAlarm();
 
-        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
+                if (status != TextToSpeech.ERROR) {
                     t1.setLanguage(Locale.UK);
                 }
             }
@@ -226,7 +205,7 @@ public class SensorService extends Service implements SensorEventListener {
         try {
             @SuppressLint("MissingPermission")
             Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Log.d(TAG, "onCreate: Last loc "+ gps_loc);
+            Log.d(TAG, "onCreate: Last loc " + gps_loc);
             return gps_loc;
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,11 +213,8 @@ public class SensorService extends Service implements SensorEventListener {
         return null;
     }
 
-
-
     @Override
     public void onDestroy() {
-
         sensorManager.unregisterListener(this, stepCounter);
         unregisterReceiver(broadcastReceiver);
         super.onDestroy();
@@ -247,35 +223,29 @@ public class SensorService extends Service implements SensorEventListener {
     //https://stackoverflow.com/questions/48124195/how-to-schedule-a-task-every-night-at-12-am
     public void createAlarm() {
         int DATA_FETCHER_RC = 123;
-        AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 20);
         calendar.set(Calendar.MINUTE, 35);
         Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC,intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mAlarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mAlarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
-    public void connectToMQTT(){
+    public void connectToMQTT() {
         //https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-paho-android-service/
+        Log.d(TAG, "connectToMQTT: " + clientId);
 
-        Log.d(TAG, "connectToMQTT: "+clientId);
-
-        client = new MqttAndroidClient(this.getApplicationContext(),"ssl://98ffc5f1d5b742ea97a55790d35f07da.s1.eu.hivemq.cloud:8883" , clientId);
+        client = new MqttAndroidClient(this.getApplicationContext(), "ssl://98ffc5f1d5b742ea97a55790d35f07da.s1.eu.hivemq.cloud:8883", clientId);
 
         try {
-
-
-//            //MQTT Version
+            //MQTT Version
             MqttConnectOptions options = new MqttConnectOptions();
-           // options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
 
-//
             //MQTT LWT
             String topic = "users/steps";
             byte[] payload = "offline".getBytes();
-            options.setWill(topic, payload ,1,true);
-
+            options.setWill(topic, payload, 1, true);
 
             //MQTT password username
             options.setUserName("miotuser");
@@ -283,7 +253,6 @@ public class SensorService extends Service implements SensorEventListener {
             client.setCallback(new MqttCallbackHandler(this.getApplicationContext()));
 
             IMqttToken token = client.connect(options);
-
 
             token.setActionCallback(new IMqttActionListener() {
                 @Override
@@ -304,7 +273,7 @@ public class SensorService extends Service implements SensorEventListener {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-    };
+    }
 
     public class MqttCallbackHandler implements MqttCallbackExtended {
         public MqttCallbackHandler(Context applicationContext) {
@@ -324,12 +293,11 @@ public class SensorService extends Service implements SensorEventListener {
         public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
             Log.d("Anjing", mqttMessage.toString());
             int data = Integer.parseInt(mqttMessage.toString());
-             handleBroadcast(ACTION_GLOBAL_GOAL,data);
-                       global_goal_set = true;
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putInt("global_goal", data);
-                    editor.putBoolean("global_goal_set", true);
-                    editor.apply(); // commit changes
+            handleBroadcast(ACTION_GLOBAL_GOAL, data);
+            global_goal_set = true;
+            editor.putInt("global_goal", data);
+            editor.putBoolean("global_goal_set", true);
+            editor.apply(); // commit changes
         }
 
         @Override
@@ -338,12 +306,7 @@ public class SensorService extends Service implements SensorEventListener {
         }
     }
 
-    public void subscribeToMQTT(){
-
-
-
-
-
+    public void subscribeToMQTT() {
         String topic = "users/global_goal";
         int qos = 1;
         try {
@@ -367,10 +330,10 @@ public class SensorService extends Service implements SensorEventListener {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-    };
+    }
 
-    public void publishToMQTT(int value){
-        Log.d(TAG, "pushDataToMQTT: Sending data to MQTT:"+value);
+    public void publishToMQTT(int value) {
+        Log.d(TAG, "pushDataToMQTT: Sending data to MQTT:" + value);
         String topic = "users/steps";
         String payload = Integer.toString(value);
         byte[] encodedPayload = new byte[0];
@@ -381,29 +344,28 @@ public class SensorService extends Service implements SensorEventListener {
         } catch (UnsupportedEncodingException | MqttException e) {
             e.printStackTrace();
         }
-    };
-
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
-                user_steps+=50;
+                user_steps += 50;
 
                 updateSensorValue(user_steps);
                 publishToMQTT(user_steps);
-                handleBroadcast(ACTION_STEP_VALUE,user_steps);
-                Log.d(TAG, "onSensorChanged: "+user_steps);
+                handleBroadcast(ACTION_STEP_VALUE, user_steps);
+                Log.d(TAG, "onSensorChanged: " + user_steps);
                 break;
         }
     }
 
-    void handleBroadcast(String ACTION,int value){
+    void handleBroadcast(String ACTION, int value) {
         final Intent intent = new Intent(ACTION);
-        intent.putExtra(EXTRA_DATA_VALUE,value);
+        intent.putExtra(EXTRA_DATA_VALUE, value);
         sendBroadcast(intent);
-        Log.d(TAG, "handleBroadcast: Action ="+ACTION+" Value:"+value);
-    };
+        Log.d(TAG, "handleBroadcast: Action =" + ACTION + " Value:" + value);
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
