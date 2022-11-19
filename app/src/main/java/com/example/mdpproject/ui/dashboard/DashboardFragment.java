@@ -20,6 +20,7 @@ import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
 import com.example.mdpproject.db.MonthlyInfo;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -78,7 +79,7 @@ public class DashboardFragment extends Fragment {
         year = root.findViewById(R.id.dashboard_button_year);
         LocationHistory = root.findViewById(R.id.dashboard_location_history);
 
-        barChart = (BarChart) root.findViewById(R.id.dashboard_barchart);
+        barChart = root.findViewById(R.id.dashboard_barchart);
         barChart.getDescription().setEnabled(false);
         barChart.setDrawValueAboveBar(true);
         barChart.setFitBars(true);
@@ -95,6 +96,7 @@ public class DashboardFragment extends Fragment {
         bardataset.setColors(ColorTemplate.MATERIAL_COLORS);
         bardataset.setValueTextColor(Color.BLACK);
         bardataset.setValueTextSize(16f);
+        bardataset.setAxisDependency(YAxis.AxisDependency.RIGHT);
 
         dbHelper = new DBHelper(this.getContext());
         setWeeklyDailyInfoList();
@@ -187,7 +189,7 @@ public class DashboardFragment extends Fragment {
 
         // If the list is empty (it's the first time using the app)
         if (localDailyInfoList.size() == 0) {
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 1; i <= days; i++) {
                 dailyInfoList.add(new BarEntry(spacing, 0));
                 spacing += 100;
             }
@@ -195,7 +197,7 @@ public class DashboardFragment extends Fragment {
             // If there are records on the database
             Map<Integer, DailyInfo> dailyInfoMap = new HashMap<>();
             Calendar cal = Calendar.getInstance();
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 1; i <= days; i++) {
                 cal.add(Calendar.DATE, -i);
                 Date tempDate = cal.getTime();
                 dailyInfoMap.put(i, new DailyInfo());
@@ -214,10 +216,7 @@ public class DashboardFragment extends Fragment {
                 spacing += 100;
             }
         }
-        bardataset.setValues(dailyInfoList);
-        barChart.notifyDataSetChanged();
-        barChart.refreshDrawableState();
-        barChart.invalidate();
+        refreshChart(dailyInfoList);
     }
 
     public void weekSelected() {
@@ -250,9 +249,18 @@ public class DashboardFragment extends Fragment {
             monthlyInfoList.add(new BarEntry(spacing, entry.getValue().getSteps()));
             spacing += 100;
         }
+        refreshChart(monthlyInfoList);
+    }
+
+    private void refreshChart(List<BarEntry> monthlyInfoList) {
         bardataset.setValues(monthlyInfoList);
-        barChart.refreshDrawableState();
+        if (barChart.getData() != null) {
+            barChart.getData().notifyDataChanged();
+            barChart.getXAxis().setAxisMaximum(barChart.getData().getXMax() + 35f);
+            barChart.getXAxis().setAxisMinimum(barChart.getData().getXMin() - 35f);
+        }
         barChart.notifyDataSetChanged();
+        barChart.refreshDrawableState();
         barChart.invalidate();
     }
 
