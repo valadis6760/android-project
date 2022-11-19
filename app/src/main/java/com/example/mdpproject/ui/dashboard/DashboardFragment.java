@@ -312,8 +312,8 @@ public class DashboardFragment extends Fragment {
         dbHelper.addDailyInfo(new DailyInfo(january15th, 2000));
         dbHelper.addDailyInfo(new DailyInfo(february1st, 3000));
         dbHelper.addDailyInfo(new DailyInfo(february15th, 4000));
-        dbHelper.addDailyInfo(new DailyInfo(july1st, 5000));
-        dbHelper.addDailyInfo(new DailyInfo(july15th, 6000));
+        dbHelper.addDailyInfo(new DailyInfo(july1st, 5000, "40.388863", "-3.627624", true));
+        dbHelper.addDailyInfo(new DailyInfo(july15th, 6000, "40.399191", "-3.621874", true));
         dbHelper.addDailyInfo(new DailyInfo(yesterday, 7000));
     }
 
