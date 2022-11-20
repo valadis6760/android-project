@@ -211,8 +211,8 @@ public class SensorService extends Service implements SensorEventListener {
         int DATA_FETCHER_RC = 123;
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 35);
+        calendar.set(Calendar.HOUR_OF_DAY, 24);
+        calendar.set(Calendar.MINUTE, 0);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, DATA_FETCHER_RC, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
@@ -334,7 +334,6 @@ public class SensorService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
-                user_steps += 50;
                 updateSensorValue(user_steps);
                 publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE, user_steps);
