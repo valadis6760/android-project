@@ -17,7 +17,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "activities_db";
-    DateFormat dt = new SimpleDateFormat("yyyy/MM/dd");
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,7 +44,7 @@ public class DBHelper extends SQLiteOpenHelper {
             do {
                 DailyInfo dailyInfo = new DailyInfo();
                 dailyInfo.setId(cursor.getString(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_ID)));
-                dailyInfo.setDate(dt.parse(cursor.getString(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_DATE))));
+                dailyInfo.setDate(dateFormat.parse(cursor.getString(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_DATE))));
                 dailyInfo.setSteps(cursor.getInt(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_STEPS)));
                 dailyInfo.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_LATITUDE)));
                 dailyInfo.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(DailyInfo.COLUMN_LONGITUDE)));
@@ -59,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DailyInfo.COLUMN_ID, dailyInfo.getId());
-        values.put(DailyInfo.COLUMN_DATE, dt.format(dailyInfo.getDate()));
+        values.put(DailyInfo.COLUMN_DATE, dateFormat.format(dailyInfo.getDate()));
         values.put(DailyInfo.COLUMN_STEPS, dailyInfo.getSteps());
         values.put(DailyInfo.COLUMN_LATITUDE, dailyInfo.getLatitude());
         values.put(DailyInfo.COLUMN_LONGITUDE, dailyInfo.getLongitude());
@@ -80,13 +80,13 @@ public class DBHelper extends SQLiteOpenHelper {
                         DailyInfo.COLUMN_LATITUDE,
                         DailyInfo.COLUMN_LONGITUDE,
                         DailyInfo.COLUMN_GOAL_REACHED}, "date=?",
-                new String[]{dt.format(date)}, null, null, null, null);
+                new String[]{dateFormat.format(date)}, null, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
             dailyInfo = new DailyInfo(
                     cursor.getString(0),
-                    dt.parse(cursor.getString(1)),
+                    dateFormat.parse(cursor.getString(1)),
                     Integer.parseInt(cursor.getString(2)),
                     cursor.getString(3),
                     cursor.getString(4),
@@ -106,7 +106,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         DailyInfo.COLUMN_LATITUDE,
                         DailyInfo.COLUMN_LONGITUDE,
                         DailyInfo.COLUMN_GOAL_REACHED}, "date between ? and ?",
-                new String[]{dt.format(fromDate), dt.format(toDate)}, null, null, null, null);
+                new String[]{dateFormat.format(fromDate), dateFormat.format(toDate)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
         List<DailyInfo> dailyInfoList = new ArrayList<>();
@@ -115,7 +115,7 @@ public class DBHelper extends SQLiteOpenHelper {
             do {
                 DailyInfo dailyInfo = new DailyInfo();
                 dailyInfo.setId(cursor.getString(0));
-                dailyInfo.setDate(dt.parse(cursor.getString(1)));
+                dailyInfo.setDate(dateFormat.parse(cursor.getString(1)));
                 dailyInfo.setSteps(Integer.parseInt(cursor.getString(2)));
                 dailyInfo.setLatitude(cursor.getString(3));
                 dailyInfo.setLongitude(cursor.getString(4));
@@ -130,7 +130,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void updateDailyInfo(DailyInfo dailyInfo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DailyInfo.COLUMN_DATE, dt.format(dailyInfo.getDate()));
+        values.put(DailyInfo.COLUMN_DATE, dateFormat.format(dailyInfo.getDate()));
         values.put(DailyInfo.COLUMN_STEPS, dailyInfo.getSteps());
         values.put(DailyInfo.COLUMN_LATITUDE, dailyInfo.getLatitude());
         values.put(DailyInfo.COLUMN_LONGITUDE, dailyInfo.getLongitude());
