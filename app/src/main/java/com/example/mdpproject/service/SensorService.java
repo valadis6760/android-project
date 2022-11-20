@@ -47,10 +47,7 @@ public class SensorService extends Service implements SensorEventListener {
     private Sensor stepCounter;
     private int user_steps;
     private int user_goal;
-    private int global_goal;
     private boolean user_goal_complete = false;
-    private boolean user_global_goal_complete = false;
-    private boolean global_goal_set = false;
 
     MqttAndroidClient client;
     DBHelper dbHelper;
@@ -98,10 +95,9 @@ public class SensorService extends Service implements SensorEventListener {
             Log.d(TAG, "onReceive: " + action);
             if (AlarmReceiver.ACTION_ALARM_SET.equals(action)) {
                 persistData();
-                Log.d(TAG, "Alarm Set In Service !");
+                Log.d(TAG, "Alarm Set In Service!");
                 user_steps = 0;
                 user_goal_complete = false;
-                user_global_goal_complete = false;
                 text_to_speak_threshold = 20;
                 updateSensorValue(user_steps);
                 handleBroadcast(ACTION_ALARM, 0);
@@ -175,16 +171,12 @@ public class SensorService extends Service implements SensorEventListener {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         clientId = MqttClient.generateClientId(); //paho42344242777022
-        //subscribeToMQTT();
 
         user_steps = sharedpreferences.getInt("sensor_step", 0);
-        global_goal = sharedpreferences.getInt("global_goal", 0);
         user_goal = sharedpreferences.getInt("goal", 0);
         text_to_speak_threshold = sharedpreferences.getInt("text_to_speak_threshold", 20);
 
-        Log.d(TAG, "onCreate: STEPSSSSSSS" + user_steps);
-
-        //getCurrentLocation();
+        Log.d(TAG, "onCreate: STEPS" + user_steps);
 
         connectToMQTT();
         createAlarm();
@@ -260,7 +252,6 @@ public class SensorService extends Service implements SensorEventListener {
                     // We are connected
                     Log.d(TAG, "MQTT CONNECT onSuccess");
                     subscribeToMQTT();
-
                 }
 
                 @Override
@@ -291,10 +282,9 @@ public class SensorService extends Service implements SensorEventListener {
 
         @Override
         public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-            Log.d("Anjing", mqttMessage.toString());
+            Log.d(TAG, "MQTT Message: " + mqttMessage.toString());
             int data = Integer.parseInt(mqttMessage.toString());
             handleBroadcast(ACTION_GLOBAL_GOAL, data);
-            global_goal_set = true;
             editor.putInt("global_goal", data);
             editor.putBoolean("global_goal_set", true);
             editor.apply(); // commit changes
@@ -351,7 +341,6 @@ public class SensorService extends Service implements SensorEventListener {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
                 user_steps += 50;
-
                 updateSensorValue(user_steps);
                 publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE, user_steps);
