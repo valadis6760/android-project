@@ -1,4 +1,4 @@
-package com.example.mdpproject.ui.dashboard;
+package com.example.mdpproject.navigation.dashboard;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import com.example.mdpproject.activity.MapsActivity;
 import com.example.mdpproject.databinding.FragmentDashboardBinding;
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
-import com.example.mdpproject.db.MonthlyInfo;
+import com.example.mdpproject.utils.MonthlyInfo;
 import com.example.mdpproject.utils.StepUtils;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.YAxis;

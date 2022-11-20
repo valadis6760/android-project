@@ -1,4 +1,4 @@
-package com.example.mdpproject.ui.dashboard;
+package com.example.mdpproject.navigation.dashboard;
 
 import androidx.lifecycle.ViewModel;
 

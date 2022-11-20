@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mdpproject.R;
-import com.example.mdpproject.model.Feed;
-import com.example.mdpproject.utils.PicassoClient;
+import com.example.mdpproject.http.Feed;
+import com.example.mdpproject.http.PicassoClient;
 
 import java.util.List;
 

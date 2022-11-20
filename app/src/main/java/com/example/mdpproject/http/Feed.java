@@ -1,9 +1,9 @@
-package com.example.mdpproject.model;
+package com.example.mdpproject.http;
 
 public class Feed {
     private String title;
-    private String Content;
-    private String ImageSrc;
+    private String content;
+    private String imageSrc;
     private String link;
 
     public String getTitle() {
@@ -15,11 +15,11 @@ public class Feed {
     }
 
     public String getContent() {
-        return Content;
+        return content;
     }
 
     public String getImageSrc() {
-        return ImageSrc;
+        return imageSrc;
     }
 
     public void setTitle(String title) {
@@ -31,11 +31,11 @@ public class Feed {
     }
 
     public void setContent(String content) {
-        Content = content;
+        this.content = content;
     }
 
     public void setImageSrc(String imageSrc) {
-        ImageSrc = imageSrc;
+        this.imageSrc = imageSrc;
     }
 
 }

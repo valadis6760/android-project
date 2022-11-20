@@ -1,4 +1,4 @@
-package com.example.mdpproject.utils;
+package com.example.mdpproject.http;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mdpproject.model.Feed;
 import com.example.mdpproject.recycler.Adapter;
 
 import org.xmlpull.v1.XmlPullParser;

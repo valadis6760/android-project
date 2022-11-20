@@ -1,4 +1,4 @@
-package com.example.mdpproject.ui.home;
+package com.example.mdpproject.navigation.home;
 
 import static android.content.ContentValues.TAG;
 

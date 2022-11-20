@@ -1,4 +1,4 @@
-package com.example.mdpproject.ui.notifications;
+package com.example.mdpproject.navigation.notifications;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mdpproject.R;
 import com.example.mdpproject.databinding.FragmentNotificationsBinding;
-import com.example.mdpproject.utils.Downloader;
+import com.example.mdpproject.http.Downloader;
 
 public class NotificationsFragment extends Fragment {
     private RecyclerView recyclerView;
-    final static String UrlAddress = "https://www.runtastic.com/blog/en/feed/";
+    final static String URL_ADDRESS = "https://www.runtastic.com/blog/en/feed/";
 
     private FragmentNotificationsBinding binding;
 
@@ -26,7 +26,7 @@ public class NotificationsFragment extends Fragment {
 
         recyclerView = root.findViewById(R.id.notification_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        new Downloader(getContext(), UrlAddress, recyclerView).execute();
+        new Downloader(getContext(), URL_ADDRESS, recyclerView).execute();
         return root;
     }
 

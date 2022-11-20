@@ -1,4 +1,4 @@
-package com.example.mdpproject.utils;
+package com.example.mdpproject.http;
 
 public class ErrorTracker {
     public final static String URLFormat = "Error: Wrong URL Format";

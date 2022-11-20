@@ -1,4 +1,4 @@
-package com.example.mdpproject.utils;
+package com.example.mdpproject.http;
 
 import android.app.ProgressDialog;
 import android.content.Context;

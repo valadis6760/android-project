@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/grey_bg"
     android:orientation="vertical"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".navigation.dashboard.DashboardFragment">
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/dashboard_barchart"

@@ -1,4 +1,4 @@
-package com.example.mdpproject.utils;
+package com.example.mdpproject.http;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

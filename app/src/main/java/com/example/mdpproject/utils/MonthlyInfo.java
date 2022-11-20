@@ -1,4 +1,4 @@
-package com.example.mdpproject.db;
+package com.example.mdpproject.utils;
 
 public class MonthlyInfo implements Comparable<MonthlyInfo> {
 
