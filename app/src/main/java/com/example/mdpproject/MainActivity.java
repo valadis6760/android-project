@@ -7,13 +7,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-import com.example.mdpproject.db.DBHelper;
-import com.example.mdpproject.db.DailyInfo;
+import com.example.mdpproject.activity.SettingsActivity;
 import com.example.mdpproject.service.SensorService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -26,8 +24,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.mdpproject.databinding.ActivityMainBinding;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
