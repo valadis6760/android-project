@@ -9,8 +9,7 @@ import android.util.Log;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    public final static String ACTION_ALARM_SET =
-            "com.example.mdpproject.receiver.ACTION_ALARM_SET";
+    public final static String ACTION_ALARM_SET = "com.example.mdpproject.receiver.ACTION_ALARM_SET";
 
     @Override
     public void onReceive(Context context, Intent intent) {

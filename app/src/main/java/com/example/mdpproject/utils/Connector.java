@@ -5,10 +5,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Connecter {
-    public static Object connector(String urladdress){
+public class Connector {
+    public static Object connector(String urlAddress) {
         try {
-            URL url = new URL(urladdress);
+            URL url = new URL(urlAddress);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             con.setRequestMethod("GET");

@@ -10,15 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mdpproject.R;
 
-public class MyViewHolder extends RecyclerView.ViewHolder{
-    ImageView Image;
-    TextView Title;
-    TextView Content;
+public class MyViewHolder extends RecyclerView.ViewHolder {
+
+    ImageView image;
+    TextView title;
+    TextView content;
+
     public MyViewHolder(@NonNull View itemView) {
         super(itemView);
-        Image = itemView.findViewById(R.id.Image);
-        Title = itemView.findViewById(R.id.title);
-        Content = itemView.findViewById(R.id.content);
-        Content.setMovementMethod(new ScrollingMovementMethod());
+        image = itemView.findViewById(R.id.Image);
+        title = itemView.findViewById(R.id.title);
+        content = itemView.findViewById(R.id.content);
+        content.setMovementMethod(new ScrollingMovementMethod());
     }
 }

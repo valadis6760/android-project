@@ -1,6 +1,5 @@
 package com.example.mdpproject.utils;
 
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -11,27 +10,27 @@ public class StepUtils {
         return bd.doubleValue();
     }
 
-    public  static int getPercent(int steps, int goal) {
+    public static int getPercent(int steps, int goal) {
         return ((int) Math.floor(((float) steps / (float) goal) * 100f));
-    };
+    }
 
     public static String getPercentToString(int steps, int goal) {
-        return ((int) Math.floor(((float) steps / (float) goal) * 100f)+"%");
-    };
+        return ((int) Math.floor(((float) steps / (float) goal) * 100f) + "%");
+    }
 
     public static double getCaloriesBurnt(int steps) {
         return (round(steps / 20));
-    };
+    }
 
     public static String getCaloriesBurntToString(int steps) {
-        return (round((steps / 20))+" kcal");
-    };
+        return (round((steps / 20)) + " kcal");
+    }
 
-
-    public  static double getDistance(int steps, int height) {
+    public static double getDistance(int steps, int height) {
         return (((0.414 * height) * steps) / 100000);
     }
+
     public static String getDistanceToString(int steps, int height) {
-        return (round(((0.414 * height) * steps) / 100000)+" Km");
+        return (round(((0.414 * height) * steps) / 100000) + " Km");
     }
 }

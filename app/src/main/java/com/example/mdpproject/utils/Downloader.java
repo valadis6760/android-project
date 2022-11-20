@@ -13,62 +13,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
-public class Downloader extends AsyncTask<Void,Void,Object> {
+public class Downloader extends AsyncTask<Void, Void, Object> {
     Context context;
-    String urladdress;
-    RecyclerView rv;
-    ProgressDialog pd;
+    String urlAddress;
+    RecyclerView recyclerView;
+    ProgressDialog progressDialog;
 
-    public Downloader(Context context, String urladdress, RecyclerView rv){
-        this.context= context;
-        this.urladdress= urladdress;
-        this.rv = rv;
+    public Downloader(Context context, String urlAddress, RecyclerView recyclerView) {
+        this.context = context;
+        this.urlAddress = urlAddress;
+        this.recyclerView = recyclerView;
     }
 
-
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         super.onPreExecute();
-        pd = new ProgressDialog(context);
-        pd.setTitle("Fetching");
-        pd.setMessage("Fetching... Please Wait");
-        pd.show();
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Fetching");
+        progressDialog.setMessage("Fetching... Please Wait");
+        progressDialog.show();
     }
 
     @Override
     protected Object doInBackground(Void... params) {
-        return downloaddata();
+        return downloadData();
     }
-
 
     @Override
-    protected void onPostExecute(Object data){
+    protected void onPostExecute(Object data) {
         super.onPostExecute(data);
-        pd.dismiss();
-        if (data.toString().startsWith("Error")){
-            Toast.makeText(context,data.toString(),Toast.LENGTH_SHORT).show();
-        }
-        else {
+        progressDialog.dismiss();
+        if (data.toString().startsWith("Error")) {
+            Toast.makeText(context, data.toString(), Toast.LENGTH_SHORT).show();
+        } else {
             // parsing
-            new Parser(context, (InputStream) data,rv).execute();
+            new Parser(context, (InputStream) data, recyclerView).execute();
         }
     }
 
-    private Object downloaddata(){
-        Object connection = Connecter.connector(urladdress);
-        if (connection.toString().startsWith("Error")){
+    private Object downloadData() {
+        Object connection = Connector.connector(urlAddress);
+        if (connection.toString().startsWith("Error")) {
             return connection.toString();
         }
-        try{
-            HttpURLConnection con = (HttpURLConnection) connection;
-            int ResponseCode = con.getResponseCode();
-            Log.i("Downloader", con.getResponseMessage());
-            if (ResponseCode == con.HTTP_OK)
-            {
-                InputStream is= new BufferedInputStream(con.getInputStream());
-                return is;
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
+            int ResponseCode = httpURLConnection.getResponseCode();
+            Log.i("Downloader", httpURLConnection.getResponseMessage());
+            if (ResponseCode == HttpURLConnection.HTTP_OK) {
+                return new BufferedInputStream(httpURLConnection.getInputStream());
             }
-            return ErrorTracker.ResponseError+con.getResponseMessage();
+            return ErrorTracker.ResponseError + httpURLConnection.getResponseMessage();
         } catch (IOException e) {
             e.printStackTrace();
             return ErrorTracker.IOError;

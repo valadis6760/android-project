@@ -7,13 +7,10 @@ import com.example.mdpproject.R;
 import com.squareup.picasso.Picasso;
 
 public class PicassoClient {
-    public static void downloadImage(Context context, String Imageurl, ImageView image)
-    {
-        if (Imageurl != null && Imageurl.length()>0)
-        {
-            Picasso.with(context).load(Imageurl).placeholder(R.drawable.image_placeholder).into(image);
-        }else
-        {
+    public static void downloadImage(Context context, String imageUrl, ImageView image) {
+        if (imageUrl != null && imageUrl.length() > 0) {
+            Picasso.with(context).load(imageUrl).placeholder(R.drawable.image_placeholder).into(image);
+        } else {
             Picasso.with(context).load(R.drawable.image_placeholder).into(image);
         }
     }

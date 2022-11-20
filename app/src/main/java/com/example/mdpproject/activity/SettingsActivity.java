@@ -27,19 +27,17 @@ public class SettingsActivity extends AppCompatActivity {
     int height;
     int weight;
     int goal;
-    boolean text_to_speech;
 
     // Indicates whether it is the first time in the app or not
     boolean firstTime = true;
 
     private RadioGroup genderRadioGroup;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Settings");
 

@@ -71,14 +71,13 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         sharedPreferences = this.getActivity().getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
-        dashboardViewModel.user_height =   sharedPreferences.getInt("height", 0);
+        dashboardViewModel.user_height = sharedPreferences.getInt("height", 0);
 
         week = root.findViewById(R.id.dashboard_button_week);
         month = root.findViewById(R.id.dashboard_button_month);
@@ -269,7 +268,7 @@ public class DashboardFragment extends Fragment {
         }
         week_user_steps.setText(Integer.toString(steps));
         week_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
-        week_distance.setText(StepUtils.getDistanceToString(steps,dashboardViewModel.user_height));
+        week_distance.setText(StepUtils.getDistanceToString(steps, dashboardViewModel.user_height));
     }
 
     private void calculateOverallStats() {
@@ -285,13 +284,14 @@ public class DashboardFragment extends Fragment {
         }
         overall_user_steps.setText(Integer.toString(steps));
         overall_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
-        overall_distance.setText(StepUtils.getDistanceToString(steps,dashboardViewModel.user_height));
+        overall_distance.setText(StepUtils.getDistanceToString(steps, dashboardViewModel.user_height));
     }
 
     private void setWeeklyDailyInfoList() {
         weeklyDailyInfo = onRangeSelect(7);
     }
 
+    // This method should be deactivated or deleted when the app goes production
     private void insertDummyData() {
         Date january1st = new Date(122, 0, 1);
         Date january15th = new Date(122, 0, 15);
