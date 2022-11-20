@@ -62,17 +62,11 @@ public class SensorService extends Service implements SensorEventListener {
 
     TextToSpeech t1;
 
-    public final static String ACTION_STEP_VALUE =
-            "com.example.mdpproject.service.ACTION_STEP_VALUE";
-    public final static String ACTION_USER_GOAL =
-            "com.example.mdpproject.service.ACTION_USER_GOAL";
-    public final static String ACTION_GLOBAL_GOAL =
-            "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
-    public final static String ACTION_ALARM =
-            "com.example.mdpproject.service.ACTION_ALARM";
-    public final static String EXTRA_DATA_VALUE =
-            "com.example.mdpproject.service.EXTRA_DATA_VALUE";
-
+    public final static String ACTION_STEP_VALUE = "com.example.mdpproject.service.ACTION_STEP_VALUE";
+    public final static String ACTION_USER_GOAL = "com.example.mdpproject.service.ACTION_USER_GOAL";
+    public final static String ACTION_GLOBAL_GOAL = "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
+    public final static String ACTION_ALARM = "com.example.mdpproject.service.ACTION_ALARM";
+    public final static String EXTRA_DATA_VALUE = "com.example.mdpproject.service.EXTRA_DATA_VALUE";
 
     public SensorService() {
     }
