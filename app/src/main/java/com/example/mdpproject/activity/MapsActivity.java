@@ -21,16 +21,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private DBHelper db;
-    private GoogleMap mMap;
+    private DBHelper dbHelper;
+    private GoogleMap googleMap;
     private ActivityMapsBinding binding;
 
-    private ArrayList<DailyInfo> allArrayList  = new ArrayList<>();
+    private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private final ArrayList<DailyInfo> allArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +44,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
-        db = new DBHelper(this);
+        dbHelper = new DBHelper(this);
         try {
-            allArrayList.addAll(db.getAllRecords());
+            allArrayList.addAll(dbHelper.getAllRecords());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -58,19 +60,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        this.googleMap = googleMap;
         LatLng last = null;
         if (allArrayList.size() > 0) {
-            for (DailyInfo x : allArrayList) {
-                if (x.getLatitude() != null && x.getLongitude() != null) {
-                    LatLng latlng = new LatLng(Double.parseDouble(x.getLatitude()), Double.parseDouble(x.getLongitude()));
-                    mMap.addMarker(new MarkerOptions().position(latlng).title(Integer.toString(x.getSteps())));
+            for (DailyInfo dailyInfo : allArrayList) {
+                if (dailyInfo.getLatitude() != null && dailyInfo.getLongitude() != null) {
+                    LatLng latlng = new LatLng(Double.parseDouble(dailyInfo.getLatitude()), Double.parseDouble(dailyInfo.getLongitude()));
+                    String title = dateFormat.format(dailyInfo.getDate()) + " | Total steps: " + dailyInfo.getSteps();
+                    this.googleMap.addMarker(new MarkerOptions().position(latlng).title(title));
                     last = latlng;
-                    Log.d("TABLE", "onCreate: content " + x.getLatitude() + " - " + x.getLongitude());
+                    Log.d("TABLE", "onCreate: content " + dailyInfo.getLatitude() + " - " + dailyInfo.getLongitude());
                 }
             }
             if (last != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(last));
+                this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(last));
                 googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
             } else {
                 new AlertDialog.Builder(MapsActivity.this)
