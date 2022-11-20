@@ -10,10 +10,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
 import com.example.mdpproject.activity.SettingsActivity;
 import com.example.mdpproject.service.SensorService;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -45,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
             navigateToSettingsActivity();
         } else {
             startService(new Intent(this, SensorService.class));
-            BottomNavigationView navView = findViewById(R.id.nav_view);
             // Passing each menu ID as a set of Ids because each
             // menu should be considered as top level destinations.
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -56,40 +52,32 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.navView, navController);
         }
 
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        ActivityCompat.requestPermissions(this, new String[] {
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_NETWORK_STATE},
+        ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_NETWORK_STATE},
                 1);
-
-
-
-
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_app_bar,menu);
+        getMenuInflater().inflate(R.menu.menu_app_bar, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-// TODO Auto-generated method stub
         switch (item.getItemId()) {
             case R.id.appbar_action_settings:
                 Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(myIntent);
                 break;
-
             default:
                 break;
         }
