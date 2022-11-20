@@ -1,6 +1,6 @@
 package com.example.mdpproject.db;
 
-public class MonthlyInfo implements Comparable<MonthlyInfo>{
+public class MonthlyInfo implements Comparable<MonthlyInfo> {
 
     private int month;
     private int steps;

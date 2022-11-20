@@ -6,12 +6,13 @@ public class Feed {
     private String ImageSrc;
     private String link;
 
-
     public String getTitle() {
         return title;
     }
 
-    public String getLink(){ return link;}
+    public String getLink() {
+        return link;
+    }
 
     public String getContent() {
         return Content;
@@ -21,7 +22,7 @@ public class Feed {
         return ImageSrc;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 

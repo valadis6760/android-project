@@ -6,8 +6,8 @@ import java.util.UUID;
 public class DailyInfo {
 
     public static final String TABLE_NAME = "activity_info";
-    public  static final String COLUMN_ID = "id";
-    public  static final String COLUMN_DATE = "date";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_DATE = "date";
     public static final String COLUMN_STEPS = "steps";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
