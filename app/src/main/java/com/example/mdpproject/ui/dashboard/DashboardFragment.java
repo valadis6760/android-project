@@ -56,9 +56,6 @@ public class DashboardFragment extends Fragment {
     private Button month;
     private Button year;
 
-    int week_steps_value = 0;
-    int overall_steps_value = 0;
-
     private TextView week_user_steps;
     private TextView week_calories_burned;
     private TextView week_distance;
@@ -70,18 +67,18 @@ public class DashboardFragment extends Fragment {
     private Button LocationHistory;
 
     SharedPreferences sharedPreferences;
-    int user_height;
+    DashboardViewModel dashboardViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        DashboardViewModel dashboardViewModel =
+        dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         sharedPreferences = this.getActivity().getSharedPreferences("shared-pref", Context.MODE_PRIVATE);
-        user_height =   sharedPreferences.getInt("height", 0);
+        dashboardViewModel.user_height =   sharedPreferences.getInt("height", 0);
 
         week = root.findViewById(R.id.dashboard_button_week);
         month = root.findViewById(R.id.dashboard_button_month);
@@ -272,7 +269,7 @@ public class DashboardFragment extends Fragment {
         }
         week_user_steps.setText(Integer.toString(steps));
         week_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
-        week_distance.setText(StepUtils.getDistanceToString(steps,user_height));
+        week_distance.setText(StepUtils.getDistanceToString(steps,dashboardViewModel.user_height));
     }
 
     private void calculateOverallStats() {
@@ -288,7 +285,7 @@ public class DashboardFragment extends Fragment {
         }
         overall_user_steps.setText(Integer.toString(steps));
         overall_calories_burned.setText(StepUtils.getCaloriesBurntToString(steps));
-        overall_distance.setText(StepUtils.getDistanceToString(steps,user_height));
+        overall_distance.setText(StepUtils.getDistanceToString(steps,dashboardViewModel.user_height));
     }
 
     private void setWeeklyDailyInfoList() {

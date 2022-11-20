@@ -42,48 +42,14 @@ public class HomeFragment extends Fragment {
     ProgressBar globalGoalProgressBar;
     CircularProgressBar userGoalProgressBar;
 
-    int steps;
-    int user_goal;
-    int user_height;
-    int global_goal;
-    boolean global_goal_set = false;
+//    int steps;
+//    int user_goal;
+//    int user_height;
+//    int global_goal;
+//    boolean global_goal_set = false;
 
-    private final BroadcastReceiver mSensorUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            switch (action) {
-                case SensorService.ACTION_STEP_VALUE:
-                    steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE, 0);
-                    userGoalProgressBar.setProgress(steps);
-                    percentTextView.setText(StepUtils.getPercentToString(steps, user_goal));
-                    if (global_goal_set) globalGoalProgressBar.setProgress(steps);
-                    stepsTextView.setText(Integer.toString(steps));
-                    distanceTextView.setText(StepUtils.getDistanceToString(steps, user_height));
-                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(steps));
-                    break;
+    HomeViewModel homeViewModel;
 
-                case SensorService.ACTION_GLOBAL_GOAL:
-                    global_goal_set = true;
-                    global_goal = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE, 0);
-                    globalGoalTextView.setText(Integer.toString(global_goal));
-                    globalGoalProgressBar.setMax(global_goal);
-                    Log.d(TAG, "handleBroadcast: Action =" + action + " Value:" + global_goal);
-                    break;
-
-                case SensorService.ACTION_ALARM:
-                    steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE, 0);
-                    userGoalProgressBar.setProgress(0);
-                    percentTextView.setText(StepUtils.getPercentToString(steps, user_goal));
-                    if (global_goal_set) globalGoalProgressBar.setProgress(steps);
-                    stepsTextView.setText(Integer.toString(steps));
-                    distanceTextView.setText(StepUtils.getDistanceToString(steps, user_height));
-                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(steps));
-                    break;
-
-            }
-        }
-    };
 
     @Override
     public void onResume() {
@@ -94,7 +60,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        HomeViewModel homeViewModel =
+        homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -113,7 +79,7 @@ public class HomeFragment extends Fragment {
         userGoalTextView = binding.homeUserGoalValue;
         globalGoalTextView = binding.homeGlobalGoalValue;
 
-        getUserData();
+       getUserData();
 
         return root;
     }
@@ -129,6 +95,45 @@ public class HomeFragment extends Fragment {
         super.onPause();
         getActivity().unregisterReceiver(mSensorUpdateReceiver);
     }
+
+    private final BroadcastReceiver mSensorUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            switch (action){
+                case SensorService.ACTION_STEP_VALUE:
+                    homeViewModel.steps = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
+                    userGoalProgressBar.setProgress(homeViewModel.steps );
+                    percentTextView.setText(StepUtils.getPercentToString(homeViewModel.steps ,homeViewModel.user_goal));
+                    if(homeViewModel.global_goal_set)globalGoalProgressBar.setProgress(homeViewModel.steps );
+                    stepsTextView.setText(Integer.toString(homeViewModel.steps ));
+                    distanceTextView.setText(StepUtils.getDistanceToString(homeViewModel.steps ,homeViewModel.user_height));
+                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(homeViewModel.steps ));
+                    break;
+
+                case SensorService.ACTION_GLOBAL_GOAL:
+                    homeViewModel.global_goal_set = true;
+                    homeViewModel.global_goal = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
+                    globalGoalTextView.setText(Integer.toString(homeViewModel.global_goal));
+                    globalGoalProgressBar.setMax(homeViewModel.global_goal);
+                    Log.d(TAG, "handleBroadcast: Action ="+action+" Value:"+homeViewModel.global_goal);
+                    break;
+
+                case SensorService.ACTION_ALARM:
+                    homeViewModel.steps  = intent.getIntExtra(SensorService.EXTRA_DATA_VALUE,0);
+                    userGoalProgressBar.setProgress(0);
+                    percentTextView.setText(StepUtils.getPercentToString(homeViewModel.steps ,homeViewModel.user_goal));
+                    if(homeViewModel.global_goal_set)globalGoalProgressBar.setProgress(homeViewModel.steps );
+                    stepsTextView.setText(Integer.toString(homeViewModel.steps ));
+                    distanceTextView.setText(StepUtils.getDistanceToString(homeViewModel.steps ,homeViewModel.user_height));
+                    caloriesTextView.setText(StepUtils.getCaloriesBurntToString(homeViewModel.steps ));
+                    break;
+
+            }
+        }
+    };
+
+
 
     private static IntentFilter sensorIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();

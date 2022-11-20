@@ -1,6 +1,4 @@
-package com.example.mdpproject;
-
-import static android.provider.ContactsContract.Intents.Insert.ACTION;
+package com.example.mdpproject.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,13 +9,12 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 
-import com.example.mdpproject.service.SensorService;
+import com.example.mdpproject.MainActivity;
+import com.example.mdpproject.R;
 import com.example.mdpproject.utils.Gender;
 
 public class SettingsActivity extends AppCompatActivity {

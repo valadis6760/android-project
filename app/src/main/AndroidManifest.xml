@@ -14,7 +14,6 @@
 
     <application
         android:allowBackup="true"
-
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher_walk"
@@ -31,7 +30,6 @@
 
         <activity
             android:name=".activity.MapsActivity"
-            android:screenOrientation="nosensor"
             android:exported="false"
             android:label="@string/title_activity_maps"
             android:parentActivityName=".MainActivity"
@@ -49,8 +47,7 @@
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="nosensor"
+            android:name=".activity.SettingsActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false"
             android:parentActivityName=".MainActivity" />

@@ -3,6 +3,7 @@ package com.example.mdpproject.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -10,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mdpproject.MainActivity;
 import com.example.mdpproject.R;
-import com.example.mdpproject.SettingsActivity;
 import com.example.mdpproject.databinding.ActivityMapsBinding;
 import com.example.mdpproject.db.DBHelper;
 import com.example.mdpproject.db.DailyInfo;
@@ -35,14 +35,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Location History");
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
         db = new DBHelper(this);
         try {
@@ -67,7 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (last != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(last));
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(5));
+                googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
             } else {
                 new AlertDialog.Builder(MapsActivity.this)
                         .setTitle("No Goals")
