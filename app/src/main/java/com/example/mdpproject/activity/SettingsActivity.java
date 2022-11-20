@@ -2,6 +2,7 @@ package com.example.mdpproject.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.widget.RadioGroup;
 
 import com.example.mdpproject.MainActivity;
 import com.example.mdpproject.R;
+import com.example.mdpproject.service.SensorService;
 import com.example.mdpproject.utils.Gender;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -27,6 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
     int height;
     int weight;
     int goal;
+    int prev_goal;
 
     // Indicates whether it is the first time in the app or not
     boolean firstTime = true;
@@ -53,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
             height = sharedPreferences.getInt("height", 0);
             weight = sharedPreferences.getInt("weight", 0);
             goal = sharedPreferences.getInt("goal", 0);
+            prev_goal = goal;
             initializeForm();
         }
         addListenerOnButton();
@@ -81,6 +85,10 @@ public class SettingsActivity extends AppCompatActivity {
             sharedPreferences.edit().putInt("height", height).apply();
             sharedPreferences.edit().putInt("weight", weight).apply();
             sharedPreferences.edit().putInt("goal", goal).apply();
+            if(isMyServiceRunning(SensorService.class)&&prev_goal!=goal){
+                stopService(new Intent(this, SensorService.class));
+                startService(new Intent(this, SensorService.class));
+            };
             Intent myIntent = new Intent(SettingsActivity.this, MainActivity.class);
             startActivity(myIntent);
         }
@@ -141,5 +149,15 @@ public class SettingsActivity extends AppCompatActivity {
             goal = Integer.parseInt(goalEt.getText().toString());
         }
         return valid;
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

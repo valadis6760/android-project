@@ -66,6 +66,7 @@ public class SensorService extends Service implements SensorEventListener {
     public final static String ACTION_USER_GOAL = "com.example.mdpproject.service.ACTION_USER_GOAL";
     public final static String ACTION_GLOBAL_GOAL = "com.example.mdpproject.service.ACTION_GLOBAL_GOAL";
     public final static String ACTION_ALARM = "com.example.mdpproject.service.ACTION_ALARM";
+
     public final static String EXTRA_DATA_VALUE = "com.example.mdpproject.service.EXTRA_DATA_VALUE";
 
     public SensorService() {
@@ -300,7 +301,6 @@ public class SensorService extends Service implements SensorEventListener {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d(TAG, "onSuccess: SCRIBED TO GLOBAL");
-
                 }
 
                 @Override
@@ -308,7 +308,6 @@ public class SensorService extends Service implements SensorEventListener {
                                       Throwable exception) {
                     // The subscription could not be performed, maybe the user was not
                     // authorized to subscribe on the specified topic e.g. using wildcards
-
                 }
             });
         } catch (MqttException e) {
@@ -334,6 +333,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_STEP_DETECTOR:
+                user_steps+=1;
                 updateSensorValue(user_steps);
                 publishToMQTT(user_steps);
                 handleBroadcast(ACTION_STEP_VALUE, user_steps);
